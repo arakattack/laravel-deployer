@@ -28,8 +28,7 @@ RUN apk add --no-cache \
     nodejs-npm \
     openssh-client \
     postgresql-libs \
-    rsync \
-    chmod \
+    rsync 
 
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
@@ -46,7 +45,7 @@ RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
 RUN cp phpcs.phar /usr/local/bin/phpcs 
 RUN chmod +x /usr/local/bin/phpcs 
 RUN cp phpcbf.phar /usr/local/bin/phpcbf 
-RUN chmoed +x /usr/local/bin/phpcbf
+RUN chmod +x /usr/local/bin/phpcbf
 
 # Install and enable php extensions
 RUN pecl install imagick
