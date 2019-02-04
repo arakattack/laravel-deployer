@@ -29,7 +29,7 @@ RUN apk add --no-cache \
     openssh-client \
     postgresql-libs \
     rsync \
-    chmod
+    chmod \
 
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
