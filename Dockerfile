@@ -40,10 +40,10 @@ RUN pecl install xdebug-2.7.0beta1 \
   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
 
 # RUN pear install PHP_CodeSniffer
-RUN git clone https://github.com/squizlabs/PHP_CodeSniffer.git 
-RUN cd PHP_CodeSniffer
-RUN cp bin/phpcs /usr/local/bin/
-RUN cp bin/phpcbf /usr/local/bin/
+RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
+RUN cp phpcs.phar /usr/local/bin/phpcs
+RUN cp phpcbf.phar /usr/local/bin/phpcbf
 
 # Install and enable php extensions
 RUN pecl install imagick
