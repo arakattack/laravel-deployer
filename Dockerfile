@@ -42,8 +42,8 @@ RUN pecl install xdebug-2.7.0beta1 \
 # RUN pear install PHP_CodeSniffer
 RUN git clone https://github.com/squizlabs/PHP_CodeSniffer.git 
 RUN cd PHP_CodeSniffer
-RUN php bin/phpcs -h
-RUN php bin/phpcbf -h
+RUN cp bin/phpcs /usr/local/bin/
+RUN cp bin/phpcbf /usr/local/bin/
 
 # Install and enable php extensions
 RUN pecl install imagick
