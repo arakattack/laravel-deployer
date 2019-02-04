@@ -40,7 +40,7 @@ RUN pecl install xdebug-2.7.0beta1 \
   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
 
 # RUN pear install PHP_CodeSniffer
-RUN git clone https://github.com/squizlabs/PHP_CodeSniffer.git .
+RUN git clone https://github.com/squizlabs/PHP_CodeSniffer.git 
 RUN cd PHP_CodeSniffer
 RUN php bin/phpcs -h
 RUN php bin/phpcbf -h
