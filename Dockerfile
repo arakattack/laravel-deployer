@@ -1,6 +1,7 @@
 FROM php:alpine
 
 # Install dev dependencies
+RUN apk update
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
     curl-dev \
@@ -39,10 +40,10 @@ RUN pecl install xdebug-2.7.0beta1 \
   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
 
 # RUN pear install PHP_CodeSniffer
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
-RUN php phpcs.phar -h
-RUN php phpcbf.phar -h
+RUN git clone https://github.com/squizlabs/PHP_CodeSniffer.git
+RUN cd PHP_CodeSniffer
+RUN php bin/phpcs -h
+RUN php bin/phpcbf -h
 
 # Install and enable php extensions
 RUN pecl install imagick
