@@ -8,8 +8,6 @@ RUN apt-get update && apt dist-upgrade -y && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
     mysql-client \
     unzip \
-    curl-dev \
-    imagemagick-dev \
     libtool \
     libxml2-dev \
     zip \
@@ -22,11 +20,9 @@ RUN apt-get update && apt dist-upgrade -y && \
     libpng-dev \
     libbz2-dev \
     libzip-dev\
-    postresql-libs \
     curl \
     git \
     cron \
-    sqlite-dev \
     && pecl channel-update pecl.php.net \
     && pecl install apcu
 
