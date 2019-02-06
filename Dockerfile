@@ -9,6 +9,7 @@ RUN apt-get update && apt dist-upgrade -y && \
     mysql-client \
     unzip \
     zip \
+    libmagickwand-dev \
     postgresql-client \
     libpq-dev \
     libfreetype6-dev \
