@@ -24,6 +24,9 @@ RUN apt-get update && apt dist-upgrade -y && \
     libcurl4-gnutls-dev \
     git \
     cron \
+    sqlite3 \
+    libsqlite3-dev \
+    apt-utils \
     && pecl channel-update pecl.php.net \
     && pecl install apcu
 
@@ -56,8 +59,6 @@ RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     pdo_pgsql \
-    sqlite3 \
-    libsqlite3-dev \
     pdo_sqlite \
     pcntl \
     tokenizer \
