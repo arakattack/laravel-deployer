@@ -21,6 +21,7 @@ RUN apt-get update && apt dist-upgrade -y && \
     libbz2-dev \
     libzip-dev\
     curl \
+    libcurl4-gnutls-dev \
     git \
     cron \
     && pecl channel-update pecl.php.net \
