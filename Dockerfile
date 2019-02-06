@@ -1,34 +1,25 @@
-FROM php:alpine
+FROM php:7.1-fpm
+#FROM registry.ipaymu.app/arakattack/laravel-deployer:latest
 
-# Install dev dependencies
-RUN apk update
-RUN apk add --no-cache --virtual .build-deps \
-    $PHPIZE_DEPS \
-    curl-dev \
-    imagemagick-dev \
-    libtool \
-    libxml2-dev \
-    postgresql-dev \
-    sqlite-dev
-
-# Install production dependencies
-RUN apk add --no-cache \
-    bash \
-    curl \
-    g++ \
-    gcc \
-    git \
-    libzip-dev \
-    imagemagick \
-    libc-dev \
-    libpng-dev \
-    make \
+# Update packages and install composer and PHP dependencies.
+RUN touch /etc/apt/sources.list.d/pgdg.list
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+RUN apt-get update && apt dist-upgrade -y && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
     mysql-client \
-    nodejs \
-    nodejs-npm \
-    openssh-client \
-    postgresql-libs \
-    rsync 
+    unzip \
+    zip \
+    postgresql-client \
+    libpq-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libmcrypt-dev \
+    libpng-dev \
+    libbz2-dev \
+    git \
+    cron \
+    && pecl channel-update pecl.php.net \
+    && pecl install apcu
 
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
@@ -67,13 +58,26 @@ RUN docker-php-ext-install \
     zip \
     bcmath
 
-# Install composer
-RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV PATH="./vendor/bin:$PATH"
+# Memory Limit
+RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini
+RUN echo "max_execution_time=900" >> $PHP_INI_DIR/conf.d/memory-limit.ini
+RUN echo "extension=apcu.so" > $PHP_INI_DIR/conf.d/apcu.ini
+RUN echo "post_max_size=20M" >> $PHP_INI_DIR/conf.d/memory-limit.ini
+RUN echo "upload_max_filesize=20M" >> $PHP_INI_DIR/conf.d/memory-limit.ini
 
-# Cleanup dev dependencies
-RUN apk del -f .build-deps
+# Time Zone
+RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > $PHP_INI_DIR/conf.d/date_timezone.ini
+# Display errors in stderr
+RUN echo "display_errors=stderr" > $PHP_INI_DIR/conf.d/display-errors.ini
 
-# Setup working directory
-WORKDIR /var/www
+# Disable PathInfo
+RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
+
+# Disable expose PHP
+RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+ADD . /var/www/html
+WORKDIR /var/www/html
