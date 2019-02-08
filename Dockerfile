@@ -95,4 +95,12 @@ RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 # Install Composer
 # RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Goto temporary directory.
+WORKDIR /tmp
+
+# Run composer and phpunit installation.
+RUN composer selfupdate && \
+    composer require "phpunit/phpunit:~5.3.4" --prefer-source --no-interaction && \
+    ln -s /tmp/vendor/bin/phpunit /usr/local/bin/phpunit
+
 WORKDIR /var/www/html
