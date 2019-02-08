@@ -103,4 +103,9 @@ RUN composer selfupdate && \
     composer require "phpunit/phpunit:~5.3.4" --prefer-source --no-interaction && \
     ln -s /tmp/vendor/bin/phpunit /usr/local/bin/phpunit
 
+VOLUME ["/app"]
 WORKDIR /var/www/html
+
+# Set up the command arguments.
+ENTRYPOINT ["/usr/local/bin/phpunit"]
+CMD ["--help"]
