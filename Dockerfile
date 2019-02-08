@@ -48,11 +48,6 @@ RUN cp phpcbf.phar /usr/local/bin/phpcbf
 RUN chmod +x /usr/local/bin/phpcbf
 
 # Install and enable php extensions
-RUN pecl install imagick
-RUN docker-php-ext-enable \
-    imagick \
-    xdebug \
-    mysqli
 
 RUN docker-php-ext-install \
     curl \
@@ -71,6 +66,11 @@ RUN docker-php-ext-install \
     mcrypt \
     bz2 \
     mysqli 
+    
+RUN pecl install imagick \
+  && docker-php-ext-enable \
+    imagick \
+    mysqli
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ 
 
