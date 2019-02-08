@@ -51,7 +51,9 @@ RUN chmod +x /usr/local/bin/phpcbf
 RUN pecl install imagick
 RUN docker-php-ext-enable \
     imagick \
-    xdebug
+    xdebug \
+    mysqli
+
 RUN docker-php-ext-install \
     curl \
     iconv \
@@ -65,8 +67,12 @@ RUN docker-php-ext-install \
     xml \
     gd \
     zip \
-    bcmath
+    bcmath \
+    mcrypt \
+    bz2 \
+    mysqli \
 
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
 # Memory Limit
 RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "max_execution_time=900" >> $PHP_INI_DIR/conf.d/memory-limit.ini
@@ -86,6 +92,6 @@ RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
 RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
+# RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
