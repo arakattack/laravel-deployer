@@ -94,4 +94,5 @@ RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 # Install Composer
 # RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN wget -O /usr/local/bin/phpunit -q https://phar.phpunit.de/phpunit.phar
 WORKDIR /var/www/html
