@@ -38,13 +38,18 @@ RUN pecl install xdebug-2.7.0beta1 \
   && echo "xdebug.remote_autostart=0" >> $xdebug_ini \
   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
 
-# RUN pear install PHP_CodeSniffer
+# Install PHP_CodeSniffer
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
 RUN cp phpcs.phar /usr/local/bin/phpcs 
 RUN chmod +x /usr/local/bin/phpcs 
 RUN cp phpcbf.phar /usr/local/bin/phpcbf 
 RUN chmod +x /usr/local/bin/phpcbf
+
+# Install phpunit
+RUN curl -OL https://phar.phpunit.de/phpunit.phar
+RUN cp phpunit.phar /usr/local/bin/phpunit
+RUN chmod +x /usr/local/bin/phpunit
 
 # Install and enable php extensions
 
@@ -94,5 +99,5 @@ RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 # Install Composer
 # RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN wget -O /usr/local/bin/phpunit -q https://phar.phpunit.de/phpunit.phar
+
 WORKDIR /var/www/html
