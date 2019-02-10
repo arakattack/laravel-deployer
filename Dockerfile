@@ -1,5 +1,4 @@
 FROM php:7.1-fpm
-#FROM registry.ipaymu.app/arakattack/laravel-deployer:latest
 
 # Update packages and install composer and PHP dependencies.
 RUN touch /etc/apt/sources.list.d/pgdg.list
