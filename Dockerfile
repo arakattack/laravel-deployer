@@ -1,4 +1,4 @@
-FROM php:7.1-fpm
+FROM php:7.2-fpm
 
 # Update packages and install composer and PHP dependencies.
 RUN touch /etc/apt/sources.list.d/pgdg.list
