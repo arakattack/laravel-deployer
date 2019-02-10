@@ -67,7 +67,6 @@ RUN docker-php-ext-install \
     gd \
     zip \
     bcmath \
-    mcrypt \
     bz2 \
     mysqli 
     
