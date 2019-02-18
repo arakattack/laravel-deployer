@@ -55,7 +55,7 @@ RUN curl -OL https://phar.phpunit.de/phpunit.phar
 RUN cp phpunit.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
 
-docker-php-ext-configure gd \
+RUN docker-php-ext-configure gd \
         --with-gd \
         --with-freetype-dir=/usr/include/ \
         --with-png-dir=/usr/include/ \
