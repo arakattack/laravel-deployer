@@ -67,8 +67,8 @@ RUN docker-php-ext-configure gd \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
     && docker-php-ext-configure pdo_pgsql --with-pgsql \
     && docker-php-ext-configure mbstring --enable-mbstring \
-    && docker-php-ext-configure soap --enable-soap \
-    && docker-php-ext-install -j$(nproc) \
+    && docker-php-ext-configure soap --enable-soap
+RUN docker-php-ext-install -j$(nproc) \
         gd \
         bcmath \
         intl \
