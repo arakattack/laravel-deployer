@@ -41,10 +41,13 @@ RUN pecl install xdebug-2.7.0beta1 \
 # Install PHP_CodeSniffer
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
+RUN curl -OL http://static.phpmd.org/php/latest/phpmd.phar
 RUN cp phpcs.phar /usr/local/bin/phpcs 
 RUN chmod +x /usr/local/bin/phpcs 
 RUN cp phpcbf.phar /usr/local/bin/phpcbf 
 RUN chmod +x /usr/local/bin/phpcbf
+RUN cp phpmd.phar /usr/local/bin/phpmd
+RUN chmod +x /usr/local/bin/phpmd
 
 # Install phpunit
 RUN curl -OL https://phar.phpunit.de/phpunit.phar
