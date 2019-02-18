@@ -68,6 +68,7 @@ RUN docker-php-ext-configure gd \
     && docker-php-ext-configure pdo_pgsql --with-pgsql \
     && docker-php-ext-configure mbstring --enable-mbstring \
     && docker-php-ext-configure soap --enable-soap
+
 RUN docker-php-ext-install -j$(nproc) \
         gd \
         bcmath \
@@ -84,7 +85,7 @@ RUN docker-php-ext-install -j$(nproc) \
         pdo_sqlite \
         xml \
         zip \
-        bz2 \
+        bz2 
 # Install and enable php extensions
 
 RUN pecl install imagick 
