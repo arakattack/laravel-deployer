@@ -55,35 +55,46 @@ RUN curl -OL https://phar.phpunit.de/phpunit.phar
 RUN cp phpunit.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
 
+docker-php-ext-configure gd \
+        --with-gd \
+        --with-freetype-dir=/usr/include/ \
+        --with-png-dir=/usr/include/ \
+        --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-configure bcmath --enable-bcmath \
+    && docker-php-ext-configure intl --enable-intl \
+    && docker-php-ext-configure pcntl --enable-pcntl \
+    && docker-php-ext-configure mysqli --with-mysqli \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
+    && docker-php-ext-configure pdo_pgsql --with-pgsql \
+    && docker-php-ext-configure mbstring --enable-mbstring \
+    && docker-php-ext-configure soap --enable-soap \
+    && docker-php-ext-install -j$(nproc) \
+        gd \
+        bcmath \
+        intl \
+        pcntl \
+        mysqli \
+        pdo_mysql \
+        pdo_pgsql \
+        mbstring \
+        soap \
+        iconv \
+        tokenizer \
+        curl \
+        pdo_sqlite \
+        xml \
+        zip \
+        bz2 \
 # Install and enable php extensions
 
-RUN docker-php-ext-install \
-    curl \
-    iconv \
-    mbstring \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    pcntl \
-    tokenizer \
-    xml \
-    gd \
-    zip \
-    bcmath \
-    bz2 \
-    mysqli 
-
-RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ 
-
-RUN pecl install imagick \
+RUN pecl install imagick 
 RUN docker-php-ext-enable \
     imagick \
     mysqli \
     mbstring \
     zip \
-    pdo_pgsql
+    pdo_pgsql \
+    pdo_mysql
     
 
 
