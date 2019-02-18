@@ -73,14 +73,19 @@ RUN docker-php-ext-install \
     bcmath \
     bz2 \
     mysqli 
-    
-RUN pecl install imagick \
-  && docker-php-ext-enable \
-    imagick \
-    mysqli
-    
+
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ 
+
+RUN pecl install imagick \
+RUN docker-php-ext-enable \
+    imagick \
+    mysqli \
+    mbstring \
+    zip \
+    pdo_pgsql
+    
+
 
 # Memory Limit
 RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini
