@@ -78,7 +78,8 @@ RUN pecl install imagick \
   && docker-php-ext-enable \
     imagick \
     mysqli
-
+    
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ 
 
 # Memory Limit
