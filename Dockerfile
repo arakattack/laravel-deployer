@@ -27,8 +27,9 @@ RUN apt-get update && apt dist-upgrade -y && \
     libsqlite3-dev \
     apt-utils \
     && pecl channel-update pecl.php.net \
-    && pecl install apcu
-
+    && pecl install apcu \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
+    && rm -rf /var/lib/apt/lists/*
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
   && docker-php-ext-enable xdebug \
