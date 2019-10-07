@@ -3,6 +3,7 @@ FROM php:7.2-fpm
 # Update packages and install composer and PHP dependencies.
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
 RUN apt-get update && apt dist-upgrade -y -o APT::Get::AllowUnauthenticated=true && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y  \
     gnupg2 \
