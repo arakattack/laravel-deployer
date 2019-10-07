@@ -5,6 +5,7 @@ RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
 RUN apt-get update && apt dist-upgrade -y && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
+    nodejs \
     mysql-client \
     unzip \
     libtool \
@@ -30,6 +31,8 @@ RUN apt-get update && apt dist-upgrade -y && \
     && pecl install apcu \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
     && rm -rf /var/lib/apt/lists/*
+    
+RUN npm install
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
   && docker-php-ext-enable xdebug \
