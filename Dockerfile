@@ -4,7 +4,8 @@ FROM php:7.2-fpm
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
 
-RUN apt-get update && apt dist-upgrade -y && \
+RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 && \
+  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8 && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
     gnupg2 \
     nodejs \
@@ -33,7 +34,6 @@ RUN apt-get update && apt dist-upgrade -y && \
     && pecl install apcu \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
     && rm -rf /var/lib/apt/lists/*
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
 
 RUN npm install
 # Install PECL and PEAR extensions
