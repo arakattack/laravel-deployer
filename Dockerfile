@@ -9,7 +9,8 @@ RUN apt-get update && apt dist-upgrade -y -o APT::Get::AllowUnauthenticated=true
   DEBIAN_FRONTEND=noninteractive apt-get install -y  \
     gnupg2 \
     nodejs \
-    mysql-client \
+    mariadb-client \
+    default-mysql-client \
     unzip \
     libtool \
     libxml2-dev \
