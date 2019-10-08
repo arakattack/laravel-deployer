@@ -1,15 +1,14 @@
 FROM php:7.2-fpm
 
 # Update packages and install composer and PHP dependencies.
-RUN apt-get update && apt-get install -y gnupg2
+RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
-RUN apt-get update && apt dist-upgrade -y -o APT::Get::AllowUnauthenticated=true && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y  \
-    gnupg2 \
+RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
     nodejs \
-    mariadb-client \
+    memcached \
     default-mysql-client \
     unzip \
     libtool \
@@ -35,7 +34,6 @@ RUN apt-get update && apt dist-upgrade -y -o APT::Get::AllowUnauthenticated=true
     && pecl install apcu \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
     && rm -rf /var/lib/apt/lists/*
-
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
   && docker-php-ext-enable xdebug \
@@ -61,7 +59,8 @@ RUN curl -OL https://phar.phpunit.de/phpunit.phar
 RUN cp phpunit.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
 
-RUN docker-php-ext-configure gd \
+RUN docker-php-ext-install -j$(nproc) iconv \
+    && docker-php-ext-configure gd \
         --with-gd \
         --with-freetype-dir=/usr/include/ \
         --with-png-dir=/usr/include/ \
@@ -75,8 +74,11 @@ RUN docker-php-ext-configure gd \
     && docker-php-ext-configure mbstring --enable-mbstring \
     && docker-php-ext-configure soap --enable-soap
 
-RUN docker-php-ext-install -j$(nproc) \
-        gd \
+RUN docker-php-ext-install -j$(nproc) gd \
+        json \
+        session \
+        simplexml \
+        xmlrpc \
         bcmath \
         intl \
         pcntl \
@@ -102,8 +104,6 @@ RUN docker-php-ext-enable \
     zip \
     pdo_pgsql \
     pdo_mysql
-    
-
 
 # Memory Limit
 RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini
@@ -124,7 +124,6 @@ RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
 RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 
 # Install Composer
-# RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www/html
