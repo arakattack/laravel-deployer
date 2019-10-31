@@ -2,7 +2,6 @@ FROM php:7.2-fpm
 
 # Update packages and install composer and PHP dependencies.
 RUN curl -sL https://deb.nodesource.com/setup_8.x | /bin/bash -
-RUN curl -L https://www.npmjs.com/install.sh | sh
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
@@ -37,6 +36,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
     && pecl install apcu \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
     && rm -rf /var/lib/apt/lists/*
+RUN curl -L https://www.npmjs.com/install.sh | sh    
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
   && docker-php-ext-enable xdebug \
