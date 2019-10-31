@@ -1,12 +1,14 @@
 FROM php:7.2-fpm
 
 # Update packages and install composer and PHP dependencies.
+RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
 RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
+    build-essential \
     nodejs \
     memcached \
     default-mysql-client \
