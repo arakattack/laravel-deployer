@@ -18,7 +18,6 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
     zip \
     libmagickwand-dev \
     postgresql-client \
-    postgresql-dev \
     libpq-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
@@ -63,8 +62,7 @@ RUN curl -OL https://phar.phpunit.de/phpunit.phar
 RUN cp phpunit.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
 
-RUN docker-php-ext-install -j$(nproc) iconv \
-    && docker-php-ext-configure gd \
+RUN docker-php-ext-configure gd \
         --with-gd \
         --with-freetype-dir=/usr/include/ \
         --with-png-dir=/usr/include/ \
@@ -72,6 +70,7 @@ RUN docker-php-ext-install -j$(nproc) iconv \
     && docker-php-ext-configure bcmath --enable-bcmath \
     && docker-php-ext-configure intl --enable-intl \
     && docker-php-ext-configure pcntl --enable-pcntl \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-configure mysqli --with-mysqli \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
     && docker-php-ext-configure pdo_pgsql --with-pgsql \
@@ -88,7 +87,9 @@ RUN docker-php-ext-install -j$(nproc) gd \
         pcntl \
         mysqli \
         pdo_mysql \
+        pdo \
         pdo_pgsql \
+        pgsql \
         mbstring \
         soap \
         iconv \
