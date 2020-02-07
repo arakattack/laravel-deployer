@@ -1,4 +1,4 @@
-FROM php:7.3-fpm
+FROM php:7.2-fpm
 
 # Update packages and install composer and PHP dependencies.
 RUN curl -sL https://deb.nodesource.com/setup_8.x | /bin/bash -
@@ -70,7 +70,7 @@ RUN docker-php-ext-configure gd \
     && docker-php-ext-configure bcmath --enable-bcmath \
     && docker-php-ext-configure intl --enable-intl \
     && docker-php-ext-configure pcntl --enable-pcntl \
-    && docker-php-ext-configure pgsql --with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-configure pgsql \
     && docker-php-ext-configure mysqli --with-mysqli \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
     && docker-php-ext-configure pdo_pgsql --with-pgsql \
