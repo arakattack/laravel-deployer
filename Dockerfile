@@ -26,10 +26,8 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
     libpng-dev \
     libbz2-dev \
     libzip-dev \
-    oniguruma-dev \
     curl \
     libcurl4-gnutls-dev \
-    gnu-libiconv \
     git \
     cron \
     sqlite3 \
