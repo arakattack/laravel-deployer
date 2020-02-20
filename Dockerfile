@@ -25,9 +25,11 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
     libmcrypt-dev \
     libpng-dev \
     libbz2-dev \
-    libzip-dev\
+    libzip-dev \
+    oniguruma-dev \
     curl \
     libcurl4-gnutls-dev \
+    gnu-libiconv \
     git \
     cron \
     sqlite3 \
@@ -79,6 +81,7 @@ RUN docker-php-ext-configure gd \
     && docker-php-ext-configure soap --enable-soap
 
 RUN docker-php-ext-install -j$(nproc) gd \
+        ctype \
         json \
         session \
         simplexml \
