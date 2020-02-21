@@ -26,6 +26,8 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
     libpng-dev \
     libbz2-dev \
     libzip-dev \
+    libonig2 \
+    libonig-dev \
     curl \
     libcurl4-gnutls-dev \
     git \
