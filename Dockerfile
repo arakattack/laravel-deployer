@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.3-fpm
 
 # Update packages and install composer and PHP dependencies.
 RUN curl -sL https://deb.nodesource.com/setup_8.x | /bin/bash -
