@@ -33,10 +33,12 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
     sqlite3 \
     libsqlite3-dev \
     apt-utils \
+    libgmp-dev \
     && pecl channel-update pecl.php.net \
     && pecl install apcu \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
     && rm -rf /var/lib/apt/lists/*
+RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh    
 # Install PECL and PEAR extensions
 RUN pecl install xdebug-2.7.0beta1 \
