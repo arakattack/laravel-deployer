@@ -76,7 +76,8 @@ RUN docker-php-ext-configure gd \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
     && docker-php-ext-configure pdo_pgsql \
     && docker-php-ext-configure mbstring --enable-mbstring \
-    && docker-php-ext-configure soap --enable-soap
+    && docker-php-ext-configure soap --enable-soap \
+    && docker-php-ext-configure gmp
 
 RUN docker-php-ext-install -j$(nproc) gd \
         ctype \
@@ -101,7 +102,7 @@ RUN docker-php-ext-install -j$(nproc) gd \
         xml \
         zip \
         bz2 \
-        ext-gmp
+        gmp
 # Install and enable php extensions
 
 RUN pecl install imagick 
