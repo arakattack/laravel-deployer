@@ -1,3 +1,4 @@
+<pre>
                 __        __  __           __  
  ___ ________ _/ /_____ _/ /_/ /____ _____/ /__
 / _ `/ __/ _ `/  '_/ _ `/ __/ __/ _ `/ __/  '_/
@@ -7,4 +8,13 @@
            \_,_/\__/ .__/_/\___/\_, /\__/_/    
                   /_/          /___/           
                   
-PHP 7.2, Nodejs 8.x, npm 6.12.x , python 2.7
+</pre>
+
+# Laravel Deployer
+
+PHP 7.2, Nodejs latest, npm 6.12.x , python 2.7
+
+## Usage 
+```
+FROM registry.ipaymu.com/arakattack/laravel-deployer:latest
+```
