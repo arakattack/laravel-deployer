@@ -49,6 +49,11 @@ RUN pecl install xdebug-2.7.0beta1 \
   && echo "xdebug.remote_autostart=0" >> $xdebug_ini \
   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
 
+# Install redis
+RUN pecl install -o -f redis \
+  &&  rm -rf /tmp/pear \
+  &&  docker-php-ext-enable redis
+
 # Install PHP_CodeSniffer
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
