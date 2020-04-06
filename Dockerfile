@@ -57,7 +57,7 @@ RUN pecl install -o -f redis \
 # Install PHP_CodeSniffer
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
-RUN curl -OL https://github.com/phpmd/phpmd/releases/download/2.7.0/phpmd.phar
+RUN curl -OL https://github.com/phpmd/phpmd/releases/download/2.8.2/phpmd.phar
 RUN cp phpcs.phar /usr/local/bin/phpcs 
 RUN chmod +x /usr/local/bin/phpcs 
 RUN cp phpcbf.phar /usr/local/bin/phpcbf 
