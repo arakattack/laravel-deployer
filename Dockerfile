@@ -66,8 +66,8 @@ RUN cp phpmd.phar /usr/local/bin/phpmd
 RUN chmod +x /usr/local/bin/phpmd
 
 # Install phpunit
-RUN curl -OL https://phar.phpunit.de/phpunit.phar
-RUN cp phpunit.phar /usr/local/bin/phpunit
+RUN curl -OL https://phar.phpunit.de/phpunit-8.phar
+RUN cp phpunit-8.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
 
 RUN docker-php-ext-configure gd \
