@@ -40,7 +40,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
     && rm -rf /var/lib/apt/lists/*
 RUN curl -L https://www.npmjs.com/install.sh | sh    
 # Install PECL and PEAR extensions
-RUN pecl install xdebug-2.7.0beta1 \
+RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
   && xdebug_ini=$(find /usr/local/etc/php/conf.d/ -name '*xdebug.ini') \
   && if [ -z "$xdebug_ini" ]; then xdebug_ini="/usr/local/etc/php/conf.d/xdebug.ini" && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > $xdebug_ini; fi \
