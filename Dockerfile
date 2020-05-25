@@ -113,6 +113,12 @@ RUN docker-php-ext-enable \
     pdo_pgsql \
     pdo_mysql
 
+# Install redis
+RUN pecl install -o -f redis \
+  &&  rm -rf /tmp/pear \
+  &&  docker-php-ext-enable redis
+
+
 # Memory Limit
 RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "max_execution_time=900" >> $PHP_INI_DIR/conf.d/memory-limit.ini
