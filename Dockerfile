@@ -67,7 +67,6 @@ RUN cp phpunit.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
 
 RUN docker-php-ext-configure gd \
-        --with-gd \
         --with-freetype \
         --with-jpeg \
     && docker-php-ext-configure bcmath --enable-bcmath \
