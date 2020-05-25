@@ -1,5 +1,6 @@
 FROM php:7.2.29-fpm
 
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 # Update packages and install composer and PHP dependencies.
 RUN curl -sL https://deb.nodesource.com/setup_10.x | /bin/bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
@@ -41,7 +42,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh    
 # Install PECL and PEAR extensions
-RUN pecl install xdebug-2.7.0beta1 \
+RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
   && xdebug_ini=$(find /usr/local/etc/php/conf.d/ -name '*xdebug.ini') \
   && if [ -z "$xdebug_ini" ]; then xdebug_ini="/usr/local/etc/php/conf.d/xdebug.ini" && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > $xdebug_ini; fi \
