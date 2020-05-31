@@ -8,14 +8,8 @@
            \_,_/\__/ .__/_/\___/\_, /\__/_/    
                   /_/          /___/           
 </pre>
-                  
-PHP 7.3, Nodejs 10.x, npm 6.12.x , python 2.7
-
-# Usage
-
-## Dockerfile
-
-FROM arakattack/laravel-deployer:7.3
+<pre>
+FROM arakattack/laravel-deployer:latest
 
 ADD . /var/www/html
 COPY . /var/www/html
@@ -35,3 +29,4 @@ RUN composer  dump-autoload
 
 RUN chmod -R 777 /var/www/html/storage
 RUN chmod -R 755 /var/www/html/vendor
+</pre>
