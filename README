@@ -8,3 +8,28 @@
                   /_/          /___/           
                   
 PHP 7.4, Nodejs 10.x, npm 6.12.x , python 2.7
+
+# Usage
+
+## Dockerfile
+
+FROM arakattack/laravel-deployer:7.4
+
+ADD . /var/www/html
+COPY . /var/www/html
+WORKDIR /var/www/html
+
+
+RUN touch storage/logs/laravel.log
+RUN composer global require hirak/prestissimo
+RUN composer install
+COPY .env.example .env
+RUN php artisan view:clear
+RUN php artisan config:clear
+RUN php artisan cache:clear
+RUN php artisan vendor:publish --all
+RUN php artisan storage:link
+RUN composer  dump-autoload
+
+RUN chmod -R 777 /var/www/html/storage
+RUN chmod -R 755 /var/www/html/vendor
