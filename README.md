@@ -14,7 +14,7 @@ PHP 7.4, Nodejs 10.x, npm 6.12.x , python 2.7
 # Usage
 
 ## Dockerfile
-
+<pre>
 FROM arakattack/laravel-deployer:latest
 
 ADD . /var/www/html
@@ -35,3 +35,4 @@ RUN composer  dump-autoload
 
 RUN chmod -R 777 /var/www/html/storage
 RUN chmod -R 755 /var/www/html/vendor
+</pre>
