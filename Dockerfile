@@ -102,7 +102,8 @@ RUN docker-php-ext-install -j$(nproc) gd \
         pdo_sqlite \
         xml \
         zip \
-        bz2 
+        bz2 \
+        exif
 # Install and enable php extensions
 
 RUN pecl install imagick 
