@@ -110,7 +110,8 @@ RUN docker-php-ext-install -j$(nproc) gd \
   xml \
   zip \
   bz2 \
-  gmp
+  gmp \
+  opcache
 # Install and enable php extensions
 
 RUN pecl install imagick 
