@@ -40,6 +40,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
   && rm -rf /var/lib/apt/lists/*
 RUN curl -L https://www.npmjs.com/install.sh | sh    
+
 # Install PECL and PEAR extensions
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
@@ -64,6 +65,15 @@ RUN chmod +x /usr/local/bin/phpmd
 RUN curl -OL https://phar.phpunit.de/phpunit.phar
 RUN cp phpunit.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
+
+# Add opcache configuration file
+RUN echo "
+PHP_OPCACHE_ENABLE="1"
+PHP_OPCACHE_MEMORY_CONSUMPTION="128"
+PHP_OPCACHE_MAX_ACCELERATED_FILES="10000"
+PHP_OPCACHE_REVALIDATE_FREQUENCY="0"
+PHP_OPCACHE_VALIDATE_TIMESTAMPS="0"
+" > $PHP_INI_DIR/conf.d/opcache.ini
 
 RUN docker-php-ext-configure gd \
   --with-gd \
@@ -127,7 +137,7 @@ RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /
   sed -i -e "s/pm.start_servers = 2/pm.start_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 25/g" /usr/local/etc/php-fpm.d/www.conf && \
-  sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 500/g" /usr/local/etc/php-fpm.d/www.conf && \
+  sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 1000/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/;pm.status_path/pm.status_path/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Memory Limit
