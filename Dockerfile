@@ -41,6 +41,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   && rm -rf /var/lib/apt/lists/*
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh    
+
 # Install PECL and PEAR extensions
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
@@ -123,13 +124,22 @@ RUN docker-php-ext-enable \
   pdo_pgsql \
   pdo_mysql
 
+# Add opcache configuration file
+RUN echo "
+PHP_OPCACHE_ENABLE="1"
+PHP_OPCACHE_MEMORY_CONSUMPTION="128"
+PHP_OPCACHE_MAX_ACCELERATED_FILES="10000"
+PHP_OPCACHE_REVALIDATE_FREQUENCY="0"
+PHP_OPCACHE_VALIDATE_TIMESTAMPS="0"
+" > $PHP_INI_DIR/conf.d/opcache.ini
+
 # tweak php-fpm config
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.max_children = 5/pm.max_children = 40/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.start_servers = 2/pm.start_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 25/g" /usr/local/etc/php-fpm.d/www.conf && \
-  sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 500/g" /usr/local/etc/php-fpm.d/www.conf && \
+  sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 1000/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/;pm.status_path/pm.status_path/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Memory Limit
