@@ -43,6 +43,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   && rm -rf /var/lib/apt/lists/*
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh    
+
 # Install PECL and PEAR extensions
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
@@ -72,6 +73,15 @@ RUN chmod +x /usr/local/bin/phpmd
 RUN curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar
 RUN cp phpunit-8.5.3.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
+
+# Add opcache configuration file
+RUN echo " \
+PHP_OPCACHE_ENABLE="1" \
+PHP_OPCACHE_MEMORY_CONSUMPTION="128" \
+PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
+PHP_OPCACHE_REVALIDATE_FREQUENCY="0" \
+PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
+" > $PHP_INI_DIR/conf.d/opcache.ini
 
 RUN docker-php-ext-configure gd \
   --with-freetype \
