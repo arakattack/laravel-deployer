@@ -9,7 +9,7 @@
                   /_/          /___/           
 </pre>
 
-PHP 7.4, Nodejs 10.x, npm 6.12.x , python 2.7 
+PHP 8.0, Nodejs 10.x, npm 6.12.x , python 2.7 
 
 ![Docker Image CI](https://github.com/arakattack/laravel-deployer/workflows/Docker%20Image%20CI/badge.svg?branch=master)
 # Usage
