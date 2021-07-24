@@ -98,7 +98,6 @@ RUN docker-php-ext-configure gd \
   && docker-php-ext-configure gmp
 
 RUN docker-php-ext-install -j$(nproc) gd \
-  ctype \
   json \
   session \
   simplexml \
