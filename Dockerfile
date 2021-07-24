@@ -97,10 +97,8 @@ RUN docker-php-ext-configure gd \
   && docker-php-ext-configure soap --enable-soap \
   && docker-php-ext-configure gmp
 
+# Install and enable php extensions
 RUN docker-php-ext-install -j$(nproc) gd \
-  json \
-  session \
-  simplexml \
   bcmath \
   intl \
   pcntl \
@@ -109,25 +107,16 @@ RUN docker-php-ext-install -j$(nproc) gd \
   pdo \
   pdo_pgsql \
   pgsql \
-  mbstring \
   soap \
-  iconv \
-  tokenizer \
-  curl \
-  pdo_sqlite \
-  xml \
   zip \
   bz2 \
   gmp \
   opcache
-# Install and enable php extensions
-
 RUN pecl install imagick xmlrpc-beta
 RUN docker-php-ext-enable \
   xmlrpc \
   imagick \
   mysqli \
-  mbstring \
   zip \
   pdo_pgsql \
   pdo_mysql
