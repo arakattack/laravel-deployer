@@ -102,7 +102,6 @@ RUN docker-php-ext-install -j$(nproc) gd \
   json \
   session \
   simplexml \
-  xmlrpc \
   bcmath \
   intl \
   pcntl \
@@ -124,8 +123,9 @@ RUN docker-php-ext-install -j$(nproc) gd \
   opcache
 # Install and enable php extensions
 
-RUN pecl install imagick 
+RUN pecl install imagick xmlrpc-beta
 RUN docker-php-ext-enable \
+  xmlrpc \
   imagick \
   mysqli \
   mbstring \
