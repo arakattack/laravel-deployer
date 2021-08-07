@@ -42,7 +42,11 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
   && rm -rf /var/lib/apt/lists/*
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
-RUN curl -L https://www.npmjs.com/install.sh | sh    
+RUN curl -L https://www.npmjs.com/install.sh | sh  
+
+# Install swoole
+RUN pecl install swoole
+RUN touch $PHP_INI_DIR/conf.d/swoole.ini && echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
 
 # Install PECL and PEAR extensions
 RUN pecl install xdebug \
