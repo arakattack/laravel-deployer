@@ -42,6 +42,10 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   && rm -rf /var/lib/apt/lists/*
 RUN curl -L https://www.npmjs.com/install.sh | sh    
 
+# Install swoole
+RUN pecl install swoole
+RUN touch $PHP_INI_DIR/conf.d/swoole.ini && echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
+
 # Install PECL and PEAR extensions
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug \
