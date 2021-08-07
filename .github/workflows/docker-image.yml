@@ -3,13 +3,10 @@ name: Docker Image CI
 on:
   push:
     branches:
-    - master
-    - 7.4
-    - 7.3
-    - 7.2
+    - 8.0
   
   pull_request:
-    branches: [ master ]
+    branches: [ 8.0 ]
 
 jobs:
 
