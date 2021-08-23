@@ -25,6 +25,8 @@ RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.2
     dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
 RUN apt-get -y install msodbcsql17 unixodbc-dev
 RUN pecl install sqlsrv pdo_sqlsrv
+RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
+RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Update packages and install composer and PHP dependencies.
 RUN curl -sL https://deb.nodesource.com/setup_10.x | /bin/bash -
