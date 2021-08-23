@@ -1,5 +1,7 @@
 FROM php:7.4-fpm
 
+ENV ACCEPT_EULA=Y
+
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Update packages and install composer and PHP dependencies.
@@ -10,9 +12,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /et
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
   && curl https://packages.microsoft.com/config/debian/9/prod.list \
-      > /etc/apt/sources.list.d/mssql-release.list \  
-      
-ENV ACCEPT_EULA=Y
+      > /etc/apt/sources.list.d/mssql-release.list
 
 RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
   && DEBIAN_FRONTEND=noninteractive \
