@@ -16,7 +16,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
   && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
   && curl https://packages.microsoft.com/config/debian/9/prod.list \
       > /etc/apt/sources.list.d/mssql-release.list \  
-  &&. apt-get install -y --allow-unauthenticated \
+  && apt-get install -y --allow-unauthenticated \
   build-essential \
   nodejs \
   python2.7 \
