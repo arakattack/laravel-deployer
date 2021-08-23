@@ -1,4 +1,5 @@
 FROM php:7.4-fpm
+ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
