@@ -8,8 +8,33 @@ RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
-RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
+
+ENV ACCEPT_EULA=Y
+# Microsoft SQL Server Prerequisites
+RUN apt-get update \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/9/prod.list \
+        > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get install -y --no-install-recommends \
+        locales \
+        apt-transport-https \
+    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen \
+    && apt-get update \
+    && apt-get -y --no-install-recommends install \
+        unixodbc-dev \
+        msodbcsql17
+RUN docker-php-ext-install mbstring pdo pdo_mysql \
+    && pecl install sqlsrv pdo_sqlsrv xdebug \
+    && docker-php-ext-enable sqlsrv pdo_sqlsrv xdebug
+    
+#####
+RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
+  && DEBIAN_FRONTEND=noninteractive \
+  && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+  && curl https://packages.microsoft.com/config/debian/9/prod.list \
+      > /etc/apt/sources.list.d/mssql-release.list \  
+  &&. apt-get install -y --allow-unauthenticated \
   build-essential \
   nodejs \
   python2.7 \
@@ -36,10 +61,20 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   sqlite3 \
   libsqlite3-dev \
   apt-utils \
+  libgmp-dev \
+        locales \
+        apt-transport-https \
+    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen \
+    && apt-get update \
+    && apt-get -y --no-install-recommends install \
+        unixodbc-dev \
+        msodbcsql17 \
   && pecl channel-update pecl.php.net \
   && pecl install apcu \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
   && rm -rf /var/lib/apt/lists/*
+RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh    
 
 # Install swoole
@@ -55,10 +90,15 @@ RUN pecl install xdebug \
   && echo "xdebug.remote_autostart=0" >> $xdebug_ini \
   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
 
+# Install redis
+RUN pecl install -o -f redis \
+  &&  rm -rf /tmp/pear \
+  &&  docker-php-ext-enable redis
+
 # Install PHP_CodeSniffer
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
-RUN curl -OL https://github.com/phpmd/phpmd/releases/download/2.7.0/phpmd.phar
+RUN curl -OL https://github.com/phpmd/phpmd/releases/download/2.8.2/phpmd.phar
 RUN cp phpcs.phar /usr/local/bin/phpcs 
 RUN chmod +x /usr/local/bin/phpcs 
 RUN cp phpcbf.phar /usr/local/bin/phpcbf 
@@ -67,8 +107,8 @@ RUN cp phpmd.phar /usr/local/bin/phpmd
 RUN chmod +x /usr/local/bin/phpmd
 
 # Install phpunit
-RUN curl -OL https://phar.phpunit.de/phpunit.phar
-RUN cp phpunit.phar /usr/local/bin/phpunit
+RUN curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar
+RUN cp phpunit-8.5.3.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
 
 # Add opcache configuration file
@@ -91,7 +131,8 @@ RUN docker-php-ext-configure gd \
   && docker-php-ext-configure pdo_mysql --with-pdo-mysql \
   && docker-php-ext-configure pdo_pgsql \
   && docker-php-ext-configure mbstring --enable-mbstring \
-  && docker-php-ext-configure soap --enable-soap
+  && docker-php-ext-configure soap --enable-soap \
+  && docker-php-ext-configure gmp
 
 RUN docker-php-ext-install -j$(nproc) gd \
   ctype \
@@ -116,7 +157,10 @@ RUN docker-php-ext-install -j$(nproc) gd \
   xml \
   zip \
   bz2 \
-  opcache
+  gmp \
+  opcache \
+  sqlsrv \
+  pdo_sqlsrv 
 # Install and enable php extensions
 
 RUN pecl install imagick 
@@ -126,7 +170,9 @@ RUN docker-php-ext-enable \
   mbstring \
   zip \
   pdo_pgsql \
-  pdo_mysql
+  pdo_mysql \
+  sqlsrv \
+  pdo_sqlsrv
 
 # Install redis
 RUN pecl install -o -f redis \
@@ -139,15 +185,16 @@ RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /
   sed -i -e "s/pm.start_servers = 2/pm.start_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 25/g" /usr/local/etc/php-fpm.d/www.conf && \
-  sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 1000/g" /usr/local/etc/php-fpm.d/www.conf && \
+  sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 500/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/;pm.status_path/pm.status_path/g" /usr/local/etc/php-fpm.d/www.conf
+
 
 # Memory Limit
 RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "max_execution_time=900" >> $PHP_INI_DIR/conf.d/memory-limit.ini
 RUN echo "extension=apcu.so" > $PHP_INI_DIR/conf.d/apcu.ini
-RUN echo "post_max_size=20M" >> $PHP_INI_DIR/conf.d/memory-limit.ini
-RUN echo "upload_max_filesize=20M" >> $PHP_INI_DIR/conf.d/memory-limit.ini
+RUN echo "post_max_size=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini
+RUN echo "upload_max_filesize=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini
 
 # Time Zone
 RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > $PHP_INI_DIR/conf.d/date_timezone.ini
@@ -164,6 +211,5 @@ RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www/html
-
 RUN npm -v
 RUN php -i
