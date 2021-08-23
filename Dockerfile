@@ -4,22 +4,26 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Install selected extensions and other stuff
 RUN apt-get update \
-    && apt-get -y --no-install-recommends install apt-utils libxml2-dev gnupg apt-transport-https unixodbc\
+    && apt-get -y --no-install-recommends install apt-utils libxml2-dev gnupg apt-transport-https \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
-    
-# Install MS ODBC Driver for SQL Server
+
+# Install git
+RUN apt-get update \
+    && apt-get -y install git \
+    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+
+#Install ODBC Driver
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && curl http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/multiarch-support_2.27-3ubuntu1_amd64.deb -o ./multiarch-support_2.27-3ubuntu1_amd64.deb \
-    && apt-get update \
-    && apt-get -y --no-install-recommends install msodbcsql17 unixodbc-dev \
-    && apt-get -y install ./multiarch-support_2.27-3ubuntu1_amd64.deb \
-    && pecl install sqlsrv \
-    && pecl install pdo_sqlsrv \
-    && echo "extension=pdo_sqlsrv.so" >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/30-pdo_sqlsrv.ini \
-    && echo "extension=sqlsrv.so" >> `php --ini | grep "Scan for additional .ini files" | sed -e "s|.*:\s*||"`/30-sqlsrv.ini \
-    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
-    
+    && apt-get update
+
+# Install sqlsrv
+RUN apt-get update
+RUN apt-get install -y wget
+RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
+    dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
+RUN apt-get -y install msodbcsql17 unixodbc-dev
+RUN pecl install sqlsrv pdo_sqlsrv
 
 # Update packages and install composer and PHP dependencies.
 RUN curl -sL https://deb.nodesource.com/setup_10.x | /bin/bash -
