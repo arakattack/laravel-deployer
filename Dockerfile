@@ -36,6 +36,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /et
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
 RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
+  exiftool \
   build-essential \
   nodejs \
   python2.7 \
@@ -121,7 +122,7 @@ RUN docker-php-ext-configure gd \
   && docker-php-ext-configure soap --enable-soap
 
 RUN docker-php-ext-install -j$(nproc) gd \
-  exiftool \
+  exif \
   ctype \
   json \
   session \
