@@ -109,6 +109,7 @@ PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
 RUN docker-php-ext-configure gd \
   --with-freetype \
   --with-jpeg \
+  && docker-php-ext-configure exif \
   && docker-php-ext-configure bcmath --enable-bcmath \
   && docker-php-ext-configure intl --enable-intl \
   && docker-php-ext-configure pcntl --enable-pcntl \
@@ -120,6 +121,7 @@ RUN docker-php-ext-configure gd \
   && docker-php-ext-configure soap --enable-soap
 
 RUN docker-php-ext-install -j$(nproc) gd \
+  exiftool \
   ctype \
   json \
   session \
@@ -147,6 +149,7 @@ RUN docker-php-ext-install -j$(nproc) gd \
 
 RUN pecl install imagick 
 RUN docker-php-ext-enable \
+  exif \
   imagick \
   mysqli \
   mbstring \
