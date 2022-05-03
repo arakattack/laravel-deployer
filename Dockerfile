@@ -137,6 +137,7 @@ opcache.max_accelerated_files=32531 \n\
 opcache.validate_timestamps=0 \n\
 opcache.save_comments=1 \n\
 opcache.fast_shutdown=0 \n\
+opcache.enable_cli=1 \n\
 " > $PHP_INI_DIR/conf.d/opcache.ini
 
 # tweak php-fpm config
