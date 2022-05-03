@@ -29,7 +29,7 @@ RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_IN
 RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Update packages and install composer and PHP dependencies.
-RUN curl -sL https://deb.nodesource.com/setup_10.x | /bin/bash -
+RUN curl -sL https://deb.nodesource.com/setup_16.x | /bin/bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
@@ -100,11 +100,14 @@ RUN chmod +x /usr/local/bin/phpunit
 
 # Add opcache configuration file
 RUN echo "\
-PHP_OPCACHE_ENABLE="1" \n\
-PHP_OPCACHE_MEMORY_CONSUMPTION="128" \n\
-PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \n\
-PHP_OPCACHE_REVALIDATE_FREQUENCY="0" \n\
-PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
+opcache.enable=1 \n\
+opcache.memory_consumption=1024 \n\
+opcache.interned_strings_buffer=128 \n\
+opcache.max_accelerated_files=32531 \n\
+opcache.validate_timestamps=0 \n\
+opcache.save_comments=1 \n\
+opcache.fast_shutdown=0 \n\
+opcache.enable_cli=1 \n\
 " > $PHP_INI_DIR/conf.d/opcache.ini
 
 RUN docker-php-ext-configure gd \
