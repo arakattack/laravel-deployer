@@ -25,12 +25,12 @@ RUN apt-get install -y wget
 RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
     dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
 RUN apt-get -y install msodbcsql17 unixodbc-dev
-RUN pecl install sqlsrv pdo_sqlsrv
+RUN pecl install sqlsrv-5.10.0 pdo_sqlsrv-5.10.0
 RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
 RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Update packages and install composer and PHP dependencies.
-RUN curl -sL https://deb.nodesource.com/setup_10.x | /bin/bash -
+RUN curl -sL https://deb.nodesource.com/setup_16.x | /bin/bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
