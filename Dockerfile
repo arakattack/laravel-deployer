@@ -25,7 +25,7 @@ RUN apt-get install -y wget
 RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
     dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
 RUN apt-get -y install msodbcsql17 unixodbc-dev
-RUN pecl install sqlsrv-5.10.0 pdo_sqlsrv-5.10.0
+RUN pecl install sqlsrv-5.9.0 pdo_sqlsrv-5.9.0
 RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
 RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
