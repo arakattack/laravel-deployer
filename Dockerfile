@@ -4,7 +4,7 @@ ENV ACCEPT_EULA=Y
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 # Install selected extensions and other stuff
 RUN apt-get update \ 
-   && apt-get -y --no-install-recommends install apt-utils libxml2-dev gnupg apt-transport-https \ 
+   && apt-get -y --no-install-recommends install libc-ares-dev apt-utils libxml2-dev gnupg apt-transport-https \ 
    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
 
 # Install git
@@ -31,7 +31,7 @@ RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" >
 RUN curl -sL https://deb.nodesource.com/setup_16.x | /bin/bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
 RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
