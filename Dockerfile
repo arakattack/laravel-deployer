@@ -4,7 +4,7 @@ ENV ACCEPT_EULA=Y
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 # Install selected extensions and other stuff
 RUN apt-get update \ 
-   && apt-get -y --no-install-recommends install apt-utils libxml2-dev gnupg apt-transport-https \ 
+   && apt-get -y --no-install-recommends install apt-utils libc-ares-dev libxml2-dev gnupg apt-transport-https \ 
    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
 
 # Install git
