@@ -62,12 +62,13 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libsqlite3-dev \
   apt-utils \
   libgmp-dev \
+  nodejs \
+  npm \
   && pecl channel-update pecl.php.net \
   && pecl install apcu \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
   && rm -rf /var/lib/apt/lists/*
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
-RUN curl -L https://www.npmjs.com/install.sh | sh  
 
 # Install swoole
 RUN pecl install -D 'enable-sockets="no" enable-openssl="yes" enable-http2="yes" enable-mysqlnd="yes" enable-swoole-json="no" enable-swoole-curl="yes" enable-cares="yes" with-postgres="yes"' swoole
