@@ -23,7 +23,7 @@ RUN apt-get install -y wget
 RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.28-10+deb10u1_amd64.deb \
    && dpkg -i multiarch-support_2.28-10+deb10u1_amd64.deb
 RUN apt-get install aptitude -y
-RUN aptitude install libpq5 libssl1.1
+RUN aptitude install libpq5 libssl1
 RUN apt-get -y install msodbcsql17 unixodbc-dev
 RUN pecl install sqlsrv pdo_sqlsrv
 RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
