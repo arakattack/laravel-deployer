@@ -46,9 +46,6 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   zip \
   libmagickwand-dev \
   postgresql-client-11 \
-  libldap2-dev \
-  libpq5 \
-  libpq-dev \
   libfreetype6-dev \
   libjpeg62-turbo-dev \
   libmcrypt-dev \
