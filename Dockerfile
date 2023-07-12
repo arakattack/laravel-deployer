@@ -45,7 +45,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libxml2-dev \
   zip \
   libmagickwand-dev \
-  postgresql-client-10 \
+  postgresql-client-11 \
   libldap2-dev \
   libpq5 \
   libpq-dev \
