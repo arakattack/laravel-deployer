@@ -4,7 +4,7 @@ ENV ACCEPT_EULA=Y
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 # Install selected extensions and other stuff
 RUN apt-get update \ 
-   && apt-get -y --no-install-recommends install libc-ares-dev apt-utils libxml2-dev gnupg apt-transport-https libldap2-dev \ 
+   && apt-get -y --no-install-recommends install libc-ares-dev apt-utils libxml2-dev gnupg apt-transport-https \ 
    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
 
 # Install git
@@ -46,6 +46,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   zip \
   libmagickwand-dev \
   postgresql-client-10 \
+  libldap2-dev \
   libpq5 \
   libpq-dev \
   libfreetype6-dev \
