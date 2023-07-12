@@ -37,7 +37,6 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
   build-essential \
   nodejs \
-  python3 \
   memcached \
   default-mysql-client \
   unzip \
@@ -45,7 +44,6 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libxml2-dev \
   zip \
   libmagickwand-dev \
-  postgresql-10 \
   postgresql-client-10 \
   libfreetype6-dev \
   libjpeg62-turbo-dev \
