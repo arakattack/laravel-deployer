@@ -16,7 +16,7 @@ PHP 8.1, Nodejs 10.x, npm 6.12.x , python 2.7
 
 ## Dockerfile
 <pre>
-FROM arakattack/laravel-deployer:latest
+FROM arakattack/laravel-deployer:8.1
 
 ADD . /var/www/html
 COPY . /var/www/html
