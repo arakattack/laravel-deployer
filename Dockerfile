@@ -54,7 +54,6 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libbz2-dev \
   libzip-dev \
   libonig-dev \
-  curl \
   libcurl4-gnutls-dev \
   git \
   cron \
