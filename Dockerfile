@@ -45,7 +45,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libxml2-dev \
   zip \
   libmagickwand-dev \
-  postgresql-client-11 \
+  postgresql-client-10 \
   libfreetype6-dev \
   libjpeg62-turbo-dev \
   libmcrypt-dev \
