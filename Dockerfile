@@ -20,7 +20,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 # Install sqlsrv
 RUN apt-get update
 RUN apt-get install -y wget
-RUN wget http://ftp.br.debian.org/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb \
+RUN wget http://repo.libertas.pbh.gov.br/libertas/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb \
    && dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
 RUN apt-get -y install msodbcsql17 unixodbc-dev
 RUN pecl install sqlsrv pdo_sqlsrv
