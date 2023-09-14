@@ -37,7 +37,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
   build-essential \
   nodejs \
-  python2.7 \
+  python3 \
   memcached \
   default-mysql-client \
   unzip \
