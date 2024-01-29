@@ -199,7 +199,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
    { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
    && php composer-setup.php \
    && php -r "unlink('composer-setup.php');" \
-   && sudo mv composer.phar /usr/local/bin/composer
+   && mv composer.phar /usr/local/bin/composer
    
 WORKDIR /var/www/html
 RUN npm -v
