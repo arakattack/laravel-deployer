@@ -57,6 +57,10 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
    libsqlite3-dev \
    apt-utils \
    libgmp-dev \
+   libpcre3 \
+   libpcre3-dev \
+   openssl \
+   libssl-dev \
    && pecl channel-update pecl.php.net \
    && pecl install apcu \
    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
