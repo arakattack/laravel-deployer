@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
@@ -28,7 +28,7 @@ RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_IN
 RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Update packages and install composer and PHP dependencies.
-RUN curl -sL https://deb.nodesource.com/setup_16.x | /bin/bash -
+RUN curl -sL https://raw.githubusercontent.com/nodesource/distributions/master/scripts/deb/setup_18.x | /bin/bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
@@ -45,7 +45,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libxml2-dev \
   zip \
   libmagickwand-dev \
-  postgresql-client-12 \
+  postgresql-client-14 \
   libfreetype6-dev \
   libjpeg62-turbo-dev \
   libmcrypt-dev \
