@@ -148,7 +148,9 @@ RUN docker-php-ext-install -j$(nproc) gd \
   opcache \
   exif \
   fileinfo
+  
 RUN pecl install imagick xmlrpc-beta
+
 RUN docker-php-ext-enable \
   xmlrpc \
   imagick \
