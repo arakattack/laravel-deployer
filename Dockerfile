@@ -2,24 +2,14 @@ FROM php:8.3-fpm
 ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-# Install selected extensions and other stuff
-RUN apt-get update \ 
-   && apt-get -y --no-install-recommends install libc-ares-dev apt-utils libxml2-dev gnupg apt-transport-https \ 
-   && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
-
-# Install git
-RUN apt-get update \ 
-   && apt-get -y install git \ 
-   && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
 
 #Install ODBC Driver
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \ 
-   && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list \ 
-   && apt-get update 
+   && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list 
 
 # Install sqlsrv
 RUN apt-get update
-RUN apt-get install -y wget
+RUN apt-get install -y wget 
 RUN wget http://repo.libertas.pbh.gov.br/libertas/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb \
    && dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
 RUN apt-get -y install msodbcsql17 unixodbc-dev
@@ -33,38 +23,46 @@ RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
-  build-essential \
-  nodejs \
-  python3 \
-  memcached \
-  default-mysql-client \
-  unzip \
-  libtool \
-  libxml2-dev \
-  zip \
-  libmagickwand-dev \
-  postgresql-client-14 \
-  libfreetype6-dev \
-  libjpeg62-turbo-dev \
-  libmcrypt-dev \
-  libpng-dev \
-  libbz2-dev \
-  libzip-dev \
-  libonig-dev \
-  curl \
-  libcurl4-gnutls-dev \
-  git \
-  cron \
-  sqlite3 \
-  libsqlite3-dev \
-  apt-utils \
-  libgmp-dev \
-  && pecl channel-update pecl.php.net \
-  && pecl install apcu \
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \ 
+   && DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated --no-install-recommends install \
+   lsb-release \
+   libc-ares-dev \
+   apt-utils \
+   libxml2-dev \
+   gnupg \
+   apt-transport-https \ 
+   git \ 
+   build-essential \
+   nodejs \
+   python3 \
+   memcached \
+   default-mysql-client \
+   unzip \
+   libtool \
+   libxml2-dev \
+   zip \
+   libmagickwand-dev \
+   postgresql-client-14 \
+   libfreetype6-dev \
+   libjpeg62-turbo-dev \
+   libmcrypt-dev \
+   libpng-dev \
+   libbz2-dev \
+   libzip-dev \
+   libonig-dev \
+   curl \
+   libcurl4-gnutls-dev \
+   git \
+   cron \
+   sqlite3 \
+   libsqlite3-dev \
+   apt-utils \
+   libgmp-dev \
+   && pecl channel-update pecl.php.net \
+   && pecl install apcu \
+   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
+   && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
+  
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh  
 
