@@ -9,13 +9,13 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 
 # Install sqlsrv
 RUN apt-get update
-RUN apt-get install -y wget 
+RUN apt-get install -y wget \
+   gnupg \
+   apt-transport-https \ 
+   git \ 
+   lsb-release \
 RUN wget http://repo.libertas.pbh.gov.br/libertas/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb \
    && dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
-RUN apt-get -y install msodbcsql17 unixodbc-dev
-RUN pecl install sqlsrv pdo_sqlsrv
-RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
-RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Update packages and install composer and PHP dependencies.
 RUN curl -sL https://raw.githubusercontent.com/nodesource/distributions/master/scripts/deb/setup_18.x | /bin/bash -
@@ -25,13 +25,11 @@ RUN echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg m
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \ 
    && DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated --no-install-recommends install \
-   lsb-release \
+   msodbcsql17 \
+   unixodbc-dev \
    libc-ares-dev \
    apt-utils \
    libxml2-dev \
-   gnupg \
-   apt-transport-https \ 
-   git \ 
    build-essential \
    nodejs \
    python3 \
@@ -65,6 +63,10 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
   
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh  
+
+RUN pecl install sqlsrv pdo_sqlsrv
+RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
+RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Install swoole
 RUN pecl install -D 'enable-sockets="no" enable-openssl="yes" enable-http2="yes" enable-mysqlnd="yes" enable-swoole-json="no" enable-swoole-curl="yes" enable-cares="yes" with-postgres="yes"' swoole
