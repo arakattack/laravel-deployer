@@ -61,6 +61,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
    libpcre3-dev \
    openssl \
    libssl-dev \
+   libpq-dev \
    && pecl channel-update pecl.php.net \
    && pecl install apcu \
    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
