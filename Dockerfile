@@ -3,17 +3,18 @@ ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-#Install ODBC Driver
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \ 
-   && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list 
-
-# Install sqlsrv
+# Install utilities
 RUN apt-get update
 RUN apt-get install -y wget \
    gnupg \
    apt-transport-https \ 
    git \ 
-   lsb-release \
+   lsb-release 
+   
+#Install ODBC Driver
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \ 
+   && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list 
+
 RUN wget http://repo.libertas.pbh.gov.br/libertas/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb \
    && dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
 
