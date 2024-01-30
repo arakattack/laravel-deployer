@@ -1,4 +1,15 @@
+# start with the official Composer image and name it
+FROM composer:1.9.3 AS composer
+
+# continue with the official PHP image
 FROM php:8.3-fpm
+
+# copy the Composer PHAR from the Composer image into the PHP image
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+# show that both Composer and PHP run as expected
+RUN composer --version && php -v
+
 ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
@@ -192,15 +203,6 @@ RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
 # Disable expose PHP
 RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 
-# Install Composer
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-   && php -r "if (hash_file('sha384', 'composer-setup.php') \
-   === 'e21205b207c3ff031906575712edab6f13eb0b361f2085f1f1237b7126d785e826a450292b6cfd1d64d92e6563bbde02') \
-   { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
-   && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
-   && php -r "unlink('composer-setup.php');" \
-   && chmod +x /usr/local/bin/composer
-   
 WORKDIR /var/www/html
 RUN npm -v
 RUN php -i
