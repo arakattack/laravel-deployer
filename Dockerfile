@@ -121,7 +121,6 @@ RUN pecl install -D \
    enable-cares="yes" \
    with-postgres="yes"' swoole \
    -o -f redis imagick xmlrpc-beta sqlsrv pdo_sqlsrv xdebug \
-   &&  rm -rf /tmp/pear \
    &&  docker-php-ext-enable \
    redis \
    xmlrpc \
@@ -135,7 +134,8 @@ RUN pecl install -D \
    && if [ -z "$xdebug_ini" ]; then xdebug_ini="/usr/local/etc/php/conf.d/xdebug.ini" && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > $xdebug_ini; fi \
    && echo "xdebug.remote_enable=1"  >> $xdebug_ini \
    && echo "xdebug.remote_autostart=0" >> $xdebug_ini \
-   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
+   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini \
+   && rm -rf /tmp/pear \
   
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh  
