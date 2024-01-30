@@ -124,7 +124,10 @@ RUN pecl install -D \
 RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
 RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini   
 
-RUN pecl install-o -f redis imagick xmlrpc-beta sqlsrv pdo_sqlsrv xdebug \
+RUN pecl install -o -f redis \
+   &&  rm -rf /tmp/pear 
+   
+RUN pecl install imagick xmlrpc-beta sqlsrv pdo_sqlsrv xdebug \
    &&  docker-php-ext-enable \
    redis \
    xmlrpc \
