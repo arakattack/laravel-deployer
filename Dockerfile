@@ -119,8 +119,12 @@ RUN pecl install -D \
    enable-swoole-json="no" \
    enable-swoole-curl="no" \
    enable-cares="yes" \
-   with-postgres="yes"' swoole \
-   -o -f redis imagick xmlrpc-beta sqlsrv pdo_sqlsrv xdebug \
+   with-postgres="yes"' swoole 
+   
+RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
+RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini   
+
+RUN pecl install-o -f redis imagick xmlrpc-beta sqlsrv pdo_sqlsrv xdebug \
    &&  docker-php-ext-enable \
    redis \
    xmlrpc \
@@ -135,13 +139,12 @@ RUN pecl install -D \
    && echo "xdebug.remote_enable=1"  >> $xdebug_ini \
    && echo "xdebug.remote_autostart=0" >> $xdebug_ini \
    && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini \
-   && rm -rf /tmp/pear \
+   && rm -rf /tmp/pear 
   
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh  
 
-RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
-RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
+
 
 # Install swoole
 RUN touch $PHP_INI_DIR/conf.d/swoole.ini && echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
