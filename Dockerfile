@@ -1,5 +1,5 @@
 # start with the official Composer image and name it
-FROM composer:1.9.3 AS composer
+FROM composer:latest AS composer
 
 # continue with the official PHP image
 FROM php:8.3-fpm
