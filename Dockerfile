@@ -77,56 +77,6 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
    && pecl install apcu \
    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
-  
-RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
-RUN curl -L https://www.npmjs.com/install.sh | sh  
-
-RUN pecl install sqlsrv pdo_sqlsrv
-RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
-RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
-
-# Install swoole
-RUN pecl install -D 'enable-sockets="no" enable-openssl="yes" enable-http2="yes" enable-mysqlnd="yes" enable-swoole-json="no" enable-swoole-curl="no" enable-cares="yes" with-postgres="yes"' swoole
-RUN touch $PHP_INI_DIR/conf.d/swoole.ini && echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
-
-# Install PECL and PEAR extensions
-RUN pecl install xdebug \
-  && docker-php-ext-enable xdebug \
-  && xdebug_ini=$(find /usr/local/etc/php/conf.d/ -name '*xdebug.ini') \
-  && if [ -z "$xdebug_ini" ]; then xdebug_ini="/usr/local/etc/php/conf.d/xdebug.ini" && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > $xdebug_ini; fi \
-  && echo "xdebug.remote_enable=1"  >> $xdebug_ini \
-  && echo "xdebug.remote_autostart=0" >> $xdebug_ini \
-  && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
-
-
-
-# Install PHP_CodeSniffer
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
-RUN curl -OL https://github.com/phpmd/phpmd/releases/download/2.8.2/phpmd.phar
-RUN cp phpcs.phar /usr/local/bin/phpcs 
-RUN chmod +x /usr/local/bin/phpcs 
-RUN cp phpcbf.phar /usr/local/bin/phpcbf 
-RUN chmod +x /usr/local/bin/phpcbf
-RUN cp phpmd.phar /usr/local/bin/phpmd
-RUN chmod +x /usr/local/bin/phpmd
-
-# Install phpunit
-RUN curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar
-RUN cp phpunit-8.5.3.phar /usr/local/bin/phpunit
-RUN chmod +x /usr/local/bin/phpunit
-
-# Add opcache configuration file
-RUN echo "\
-opcache.enable=1 \n\
-opcache.memory_consumption=1024 \n\
-opcache.interned_strings_buffer=128 \n\
-opcache.max_accelerated_files=32531 \n\
-opcache.validate_timestamps=0 \n\
-opcache.save_comments=1 \n\
-opcache.fast_shutdown=0 \n\
-opcache.enable_cli=1 \n\
-" > $PHP_INI_DIR/conf.d/opcache.ini
 
 RUN docker-php-ext-configure gd \
   --with-freetype \
@@ -160,20 +110,69 @@ RUN docker-php-ext-install -j$(nproc) gd \
   exif \
   fileinfo
   
-RUN pecl install imagick xmlrpc
-
-RUN docker-php-ext-enable \
-  xmlrpc \
-  imagick \
-  mysqli \
-  zip \
-  pdo_pgsql \
-  pdo_mysql
-
 # Install redis
-RUN pecl install -o -f redis \
-  &&  rm -rf /tmp/pear \
-  &&  docker-php-ext-enable redis
+RUN pecl install -D \
+   'enable-sockets="no" \
+   enable-openssl="yes" \
+   enable-http2="yes" \
+   enable-mysqlnd="yes" \
+   enable-swoole-json="no" \
+   enable-swoole-curl="no" \
+   enable-cares="yes" \
+   with-postgres="yes"' swoole \
+   -o -f redis imagick xmlrpc-beta sqlsrv pdo_sqlsrv xdebug \
+   &&  rm -rf /tmp/pear \
+   &&  docker-php-ext-enable \
+   redis \
+   xmlrpc \
+   imagick \
+   mysqli \
+   zip \
+   pdo_pgsql \
+   pdo_mysql \
+   xdebug \
+   && xdebug_ini=$(find /usr/local/etc/php/conf.d/ -name '*xdebug.ini') \
+   && if [ -z "$xdebug_ini" ]; then xdebug_ini="/usr/local/etc/php/conf.d/xdebug.ini" && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > $xdebug_ini; fi \
+   && echo "xdebug.remote_enable=1"  >> $xdebug_ini \
+   && echo "xdebug.remote_autostart=0" >> $xdebug_ini \
+   && echo "xdebug.idekey=\"PHPSTORM\"" >> $xdebug_ini
+  
+RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
+RUN curl -L https://www.npmjs.com/install.sh | sh  
+
+RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
+RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
+
+# Install swoole
+RUN touch $PHP_INI_DIR/conf.d/swoole.ini && echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
+
+# Install PHP_CodeSniffer
+RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar
+RUN curl -OL https://github.com/phpmd/phpmd/releases/download/2.8.2/phpmd.phar
+RUN cp phpcs.phar /usr/local/bin/phpcs 
+RUN chmod +x /usr/local/bin/phpcs 
+RUN cp phpcbf.phar /usr/local/bin/phpcbf 
+RUN chmod +x /usr/local/bin/phpcbf
+RUN cp phpmd.phar /usr/local/bin/phpmd
+RUN chmod +x /usr/local/bin/phpmd
+
+# Install phpunit
+RUN curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar
+RUN cp phpunit-8.5.3.phar /usr/local/bin/phpunit
+RUN chmod +x /usr/local/bin/phpunit
+
+# Add opcache configuration file
+RUN echo "\
+opcache.enable=1 \n\
+opcache.memory_consumption=1024 \n\
+opcache.interned_strings_buffer=128 \n\
+opcache.max_accelerated_files=32531 \n\
+opcache.validate_timestamps=0 \n\
+opcache.save_comments=1 \n\
+opcache.fast_shutdown=0 \n\
+opcache.enable_cli=1 \n\
+" > $PHP_INI_DIR/conf.d/opcache.ini
 
 # tweak php-fpm config
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
