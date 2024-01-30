@@ -168,11 +168,6 @@ RUN docker-php-ext-enable \
   pdo_pgsql \
   pdo_mysql
 
-# Install redis
-RUN pecl install -o -f redis \
-  &&  rm -rf /tmp/pear \
-  &&  docker-php-ext-enable redis
-
 # tweak php-fpm config
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/pm.max_children = 5/pm.max_children = 40/g" /usr/local/etc/php-fpm.d/www.conf && \
