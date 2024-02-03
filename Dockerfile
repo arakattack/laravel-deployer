@@ -1,15 +1,4 @@
-# start with the official Composer image and name it
-FROM composer:latest AS composer
-
-# continue with the official PHP image
 FROM php:8.3-fpm
-
-# copy the Composer PHAR from the Composer image into the PHP image
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-
-# show that both Composer and PHP run as expected
-RUN composer --version && php -v
-
 ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
@@ -21,6 +10,11 @@ RUN apt-get install -y wget \
    apt-transport-https \ 
    git \ 
    lsb-release 
+   
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# show that both Composer and PHP run as expected
+RUN composer --version && php -v
    
 #Install ODBC Driver
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \ 
