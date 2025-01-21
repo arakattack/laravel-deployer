@@ -29,7 +29,7 @@ RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_IN
 RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Update packages and install composer and PHP dependencies.
-RUN curl -sL https://deb.nodesource.com/setup_16.x | /bin/bash -
+RUN curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
@@ -45,6 +45,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libtool \
   libxml2-dev \
   zip \
+  libssl \
   libmagickwand-dev \
   postgresql-client-12 \
   libfreetype6-dev \
