@@ -155,12 +155,8 @@ RUN docker-php-ext-enable \
   mysqli \
   zip \
   pdo_pgsql \
-  pdo_mysql
-
-# Install redis
-RUN pecl install -o -f redis \
-  &&  rm -rf /tmp/pear \
-  &&  docker-php-ext-enable redis
+  pdo_mysql \
+  redis
 
 # tweak php-fpm config
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
