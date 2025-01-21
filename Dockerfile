@@ -45,7 +45,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
   libtool \
   libxml2-dev \
   zip \
-  libssl \
+  libssl-dev \
   libmagickwand-dev \
   postgresql-client-12 \
   libfreetype6-dev \
