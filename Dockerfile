@@ -11,7 +11,7 @@ RUN apt-get install -y wget \
    git \ 
    lsb-release 
    
-RUN curl -sS https://getcomposer.org/installer | php -- --version=2.3.5 --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --version=2.5.8 --install-dir=/usr/local/bin --filename=composer
 
 # show that both Composer and PHP run as expected
 RUN composer --version && php -v
@@ -68,7 +68,7 @@ RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \
    libssl-dev \
    libpq-dev \
    && pecl channel-update pecl.php.net \
-   && pecl install apcu \
+   && pecl install apcu xmlrpc-beta\
    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
 
@@ -152,8 +152,12 @@ RUN docker-php-ext-install -j$(nproc) gd \
   opcache \
   exif \
   fileinfo
-  
-RUN pecl install imagick xmlrpc-beta
+
+RUN curl -L https://github.com/remicollet/imagick/archive/${IMAGICK_PHP83_FIX_COMMIT}.zip -o /tmp/imagick-issue-php83.zip  \
+    && unzip /tmp/imagick-issue-php83.zip -d /tmp \
+    && pecl install /tmp/imagick-${IMAGICK_PHP83_FIX_COMMIT}/package.xml \
+    && echo "extension=imagick" > /etc/php.d/20-imagick.ini
+    
 RUN docker-php-ext-enable \
   xmlrpc \
   imagick \
