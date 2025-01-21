@@ -2,6 +2,7 @@ FROM php:8.2-fpm
 ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
 # Install selected extensions and other stuff
 RUN apt-get update \ 
    && apt-get -y --no-install-recommends install libc-ares-dev apt-utils libxml2-dev gnupg apt-transport-https \ 
