@@ -3,76 +3,80 @@ ENV ACCEPT_EULA=Y
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Install selected extensions and other stuff
-RUN apt-get update \ 
-   && apt-get -y --no-install-recommends install libc-ares-dev apt-utils libxml2-dev gnupg apt-transport-https \ 
-   && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
+# Install utilities
+RUN apt-get update
+RUN apt-get install -y wget \
+   gnupg \
+   apt-transport-https \ 
+   git \ 
+   lsb-release 
+   
+RUN curl -sS https://getcomposer.org/installer | php -- --version=2.3.5 --install-dir=/usr/local/bin --filename=composer
 
-# Install git
-RUN apt-get update \ 
-   && apt-get -y install git \ 
-   && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
-
+# show that both Composer and PHP run as expected
+RUN composer --version && php -v
+   
 #Install ODBC Driver
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \ 
-   && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list \ 
-   && apt-get update 
+   && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list 
 
-# Install sqlsrv
-RUN apt-get update
-RUN apt-get install -y wget
 RUN wget https://deb.sipwise.com/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb \
    && dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb
-RUN apt-get -y install msodbcsql17 unixodbc-dev
-RUN pecl install sqlsrv pdo_sqlsrv
-RUN touch $PHP_INI_DIR/conf.d/sqlsrv.ini && echo "extension=sqlsrv.so" > $PHP_INI_DIR/conf.d/sqlsrv.ini
-RUN touch $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini && echo "extension=pdo_sqlsrv.so" > $PHP_INI_DIR/conf.d/pdo_sqlsrv.ini
 
 # Update packages and install composer and PHP dependencies.
-RUN curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash -
+RUN curl -sL https://raw.githubusercontent.com/nodesource/distributions/master/scripts/deb/setup_18.x | /bin/bash -
 RUN apt-get update && apt dist-upgrade -y && apt-get install gnupg2 -y
 RUN touch /etc/apt/sources.list.d/pgdg.list
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7FCC7D46ACCC4CF8
-RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
-  build-essential \
-  nodejs \
-  python3 \
-  memcached \
-  default-mysql-client \
-  unzip \
-  libtool \
-  libxml2-dev \
-  zip \
-  libssl-dev \
-  libmagickwand-dev \
-  postgresql-client-12 \
-  libpq-dev \
-  libfreetype6-dev \
-  libjpeg62-turbo-dev \
-  libmcrypt-dev \
-  libpng-dev \
-  libbz2-dev \
-  libzip-dev \
-  libonig-dev \
-  curl \
-  libcurl4-gnutls-dev \
-  git \
-  cron \
-  sqlite3 \
-  libsqlite3-dev \
-  apt-utils \
-  libgmp-dev \
-  && pecl channel-update pecl.php.net \
-  && pecl install apcu \
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
-  && rm -rf /var/lib/apt/lists/*
+RUN echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get update && apt dist-upgrade -y --allow-unauthenticated \ 
+   && DEBIAN_FRONTEND=noninteractive apt-get -y --allow-unauthenticated --no-install-recommends install \
+   msodbcsql17 \
+   unixodbc-dev \
+   libc-ares-dev \
+   apt-utils \
+   libxml2-dev \
+   build-essential \
+   nodejs \
+   python3 \
+   memcached \
+   default-mysql-client \
+   unzip \
+   libtool \
+   libxml2-dev \
+   zip \
+   libmagickwand-dev \
+   postgresql-client-14 \
+   libfreetype6-dev \
+   libjpeg62-turbo-dev \
+   libmcrypt-dev \
+   libpng-dev \
+   libbz2-dev \
+   libzip-dev \
+   libonig-dev \
+   curl \
+   libcurl4-gnutls-dev \
+   git \
+   cron \
+   sqlite3 \
+   libsqlite3-dev \
+   apt-utils \
+   libgmp-dev \
+   libpcre3 \
+   libpcre3-dev \
+   openssl \
+   libssl-dev \
+   libpq-dev \
+   && pecl channel-update pecl.php.net \
+   && pecl install apcu \
+   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false npm \
+   && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* 
+
 RUN ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
 RUN curl -L https://www.npmjs.com/install.sh | sh  
 
 # Install swoole
-RUN pecl install -D 'enable-sockets="no" enable-openssl="yes" enable-http2="yes" enable-mysqlnd="yes" enable-swoole-json="no" enable-swoole-curl="yes" enable-cares="yes" with-postgres="yes"' swoole
+RUN pecl install -D 'enable-sockets="no" enable-openssl="yes" enable-http2="yes" enable-mysqlnd="yes" enable-swoole-json="no" enable-swoole-curl="no" enable-cares="yes" with-postgres="yes"' swoole
 RUN touch $PHP_INI_DIR/conf.d/swoole.ini && echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
 
 # Install PECL and PEAR extensions
@@ -148,6 +152,7 @@ RUN docker-php-ext-install -j$(nproc) gd \
   opcache \
   exif \
   fileinfo
+  
 RUN pecl install imagick xmlrpc-beta
 RUN docker-php-ext-enable \
   xmlrpc \
@@ -155,8 +160,7 @@ RUN docker-php-ext-enable \
   mysqli \
   zip \
   pdo_pgsql \
-  pdo_mysql \
-  redis
+  pdo_mysql
 
 # tweak php-fpm config
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
@@ -166,7 +170,6 @@ RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /
   sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 25/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 500/g" /usr/local/etc/php-fpm.d/www.conf && \
   sed -i -e "s/;pm.status_path/pm.status_path/g" /usr/local/etc/php-fpm.d/www.conf
-
 
 # Memory Limit
 RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini
@@ -185,9 +188,6 @@ RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
 
 # Disable expose PHP
 RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --version=2.3.5 --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www/html
 RUN npm -v
