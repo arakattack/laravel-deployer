@@ -152,15 +152,9 @@ RUN docker-php-ext-install -j$(nproc) gd \
   opcache \
   exif \
   fileinfo
-
-RUN curl -L https://github.com/remicollet/imagick/archive/${IMAGICK_PHP83_FIX_COMMIT}.zip -o /tmp/imagick-issue-php83.zip  \
-    && unzip /tmp/imagick-issue-php83.zip -d /tmp \
-    && pecl install /tmp/imagick-${IMAGICK_PHP83_FIX_COMMIT}/package.xml \
-    && echo "extension=imagick" > /etc/php.d/20-imagick.ini
     
 RUN docker-php-ext-enable \
   xmlrpc \
-  imagick \
   mysqli \
   zip \
   pdo_pgsql \
