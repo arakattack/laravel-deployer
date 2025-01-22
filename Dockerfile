@@ -65,18 +65,9 @@ RUN pecl install xdebug && \
 RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo && \
     docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
 
-# Install XML-RPC
-RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && \
-    touch $PHP_INI_DIR/conf.d/xmlrpc.ini && \
-    echo "extension=xmlrpc.so" > $PHP_INI_DIR/conf.d/xmlrpc.ini
-RUN docker-php-ext-enable xmlrpc
-
-# Install ImageMagick and imagick PHP extension
-RUN apt-get update && apt-get install -y \
-    libmagickwand-dev \
-    imagemagick && \
-    pecl install imagick-beta && \
-    docker-php-ext-enable imagick
+# Install XML-RPC and imagick PHP extension
+RUN pecl install imagick xmlrpc-beta && \
+    docker-php-ext-enable xmlrpc imagick 
     
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
