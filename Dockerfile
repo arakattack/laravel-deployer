@@ -62,7 +62,7 @@ RUN pecl install xdebug && \
 
 # Install PHP extensions
 RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo && \
-    docker-php-ext-enable xmlrpc mysqli zip pdo_pgsql pdo_mysql
+    docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
 
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
