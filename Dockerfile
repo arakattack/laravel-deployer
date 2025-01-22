@@ -71,6 +71,13 @@ RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && \
     echo "extension=xmlrpc.so" > $PHP_INI_DIR/conf.d/xmlrpc.ini
 RUN docker-php-ext-enable xmlrpc
 
+# Install ImageMagick and imagick PHP extension
+RUN apt-get update && apt-get install -y \
+    libmagickwand-dev \
+    imagemagick && \
+    pecl install imagick && \
+    docker-php-ext-enable imagick
+    
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php && \
