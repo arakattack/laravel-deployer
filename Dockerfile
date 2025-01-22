@@ -65,9 +65,9 @@ RUN pecl install xdebug && \
 RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo && \
     docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
 
-# Install XML-RPC and imagick PHP extension
-RUN pecl install imagick xmlrpc-beta && \
-    docker-php-ext-enable xmlrpc imagick 
+# Install XML-RPC 
+RUN pecl install xmlrpc-beta && \
+    docker-php-ext-enable xmlrpc  
     
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
