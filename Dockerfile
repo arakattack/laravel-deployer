@@ -186,8 +186,6 @@ RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
 # Disable expose PHP
 RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 
-html
-
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php && \
