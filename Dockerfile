@@ -186,8 +186,17 @@ RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
 # Disable expose PHP
 RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
 
+html
+
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --version=2.3.5 --install-dir=/usr/local/bin --filename=composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    mv composer.phar /usr/local/bin/composer
+
+# Configure Git to treat this directory as safe
+RUN git config --global --add safe.directory /var/www/html
+
 
 WORKDIR /var/www/html
 RUN npm -v
