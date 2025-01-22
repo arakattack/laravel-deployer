@@ -5,11 +5,14 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Install curl dan wget terlebih dahulu
 RUN apt-get update && apt-get install -y \
+    git \
+    lsb-release \
+    gnupg2 \
+    build-essential \
     curl \
     wget \
     gnupg \
-    apt-transport-https && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    apt-transport-https
 
 # Add necessary keys and repositories
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
@@ -20,10 +23,6 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
 
 # Install all remaining dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    lsb-release \
-    gnupg2 \
-    build-essential \
     python3 \
     memcached \
     default-mysql-client \
