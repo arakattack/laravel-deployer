@@ -69,8 +69,7 @@ RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3
 RUN docker-php-ext-enable xmlrpc
 
 # Install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash - && \
-    apt-get install -y nodejs
+RUN curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash -
     
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
