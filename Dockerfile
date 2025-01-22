@@ -47,7 +47,8 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     touch /etc/apt/sources.list.d/pgdg.list && \
     echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-    apt-get update && apt-get install -y msodbcsql17 unixodbc-dev postgresql-client-14 libpq-dev
+    curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash - && \
+    apt-get update && apt-get install -y msodbcsql17 unixodbc-dev postgresql-client-14 libpq-dev nodejs
 
 # Install swoole
 RUN pecl install swoole && \
@@ -65,12 +66,11 @@ RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_
     docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
 
 # Install XML-RPC
-RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 
+RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && \
+    touch $PHP_INI_DIR/conf.d/xmlrpc.ini && \
+    echo "extension=xmlrpc.so" > $PHP_INI_DIR/conf.d/xmlrpc.ini
 RUN docker-php-ext-enable xmlrpc
 
-# Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash -
-    
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php && \
