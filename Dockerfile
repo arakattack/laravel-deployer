@@ -11,11 +11,7 @@ RUN apt-get install -y wget \
    git \ 
    lsb-release 
    
-RUN curl -sS https://getcomposer.org/installer | php -- --version=2.5.8 --install-dir=/usr/local/bin --filename=composer
 
-# show that both Composer and PHP run as expected
-RUN composer --version && php -v
-   
 #Install ODBC Driver
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \ 
    && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list 
@@ -186,6 +182,15 @@ RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini
 
 # Disable expose PHP
 RUN echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
+
+# Install Composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    mv composer.phar /usr/local/bin/composer
+
+# Configure Git to treat this directory as safe
+RUN git config --global --add safe.directory /var/www/html
 
 WORKDIR /var/www/html
 RUN npm -v
