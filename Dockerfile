@@ -75,7 +75,7 @@ RUN docker-php-ext-enable xmlrpc
 RUN apt-get update && apt-get install -y \
     libmagickwand-dev \
     imagemagick && \
-    pecl install imagick && \
+    pecl install imagick-beta && \
     docker-php-ext-enable imagick
     
 # Install Composer
