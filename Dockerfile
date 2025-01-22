@@ -64,6 +64,14 @@ RUN pecl install xdebug && \
 RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo && \
     docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
 
+# Install XML-RPC
+RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 
+RUN docker-php-ext-enable xmlrpc
+
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash - && \
+    apt-get install -y nodejs
+    
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php && \
