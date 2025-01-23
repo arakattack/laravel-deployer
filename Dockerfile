@@ -66,7 +66,7 @@ RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_
     docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
 
 # Install XML-RPC 
-RUN pecl install xmlrpc-beta && \
+RUN pecl install apcu xmlrpc-beta && \
     docker-php-ext-enable xmlrpc  
     
 # Install Composer
