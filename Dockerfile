@@ -1,73 +1,97 @@
 FROM php:8.2-fpm
 ENV ACCEPT_EULA=Y
 
-# Move production php.ini
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Install selected extensions and other stuff
-RUN apt-get update && apt-get -y --no-install-recommends install \
-    libc-ares-dev apt-utils libxml2-dev gnupg apt-transport-https \
-    git wget curl build-essential nodejs python3 memcached default-mysql-client \
-    unzip libtool libssl-dev libmagickwand-dev postgresql-client-12 libpq-dev \
-    libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng-dev libbz2-dev \
-    libzip-dev libonig-dev libcurl4-gnutls-dev cron sqlite3 libsqlite3-dev \
-    apt-utils libgmp-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+# Install utilities
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    apt-transport-https \
+    git \
+    lsb-release \
+    curl \
+    cron \
+    unzip \
+    libtool \
+    libxml2-dev \
+    zlib1g \
+    zip \
+    libcurl4-gnutls-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libmcrypt-dev \
+    libpng-dev \
+    libbz2-dev \
+    libzip-dev \
+    libonig-dev \
+    sqlite3 \
+    libsqlite3-dev \
+    libgmp-dev \
+    libpcre3 \
+    libpcre3-dev \
+    openssl \
+    libssl-dev \
+    libmagickwand-dev \
+    python3 \
+    nodejs \
+    memcached \
+    default-mysql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install ODBC Driver
+# Install Microsoft ODBC Driver and Postgres Client
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && apt-get install -y msodbcsql17 unixodbc-dev && \
-    pecl install sqlsrv pdo_sqlsrv && \
-    docker-php-ext-enable sqlsrv pdo_sqlsrv
+    wget https://deb.sipwise.com/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
+    dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb && \
+    touch /etc/apt/sources.list.d/pgdg.list && \
+    echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash - && \
+    apt-get update && apt-get install -y msodbcsql17 unixodbc-dev postgresql-client-14 libpq-dev nodejs
 
+# Install swoole
+RUN pecl install swoole && \
+    touch $PHP_INI_DIR/conf.d/swoole.ini && \
+    echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
+
+# Install PECL extensions
+RUN pecl install xdebug && \
+    docker-php-ext-enable xdebug && \
+    pecl install redis && \
+    docker-php-ext-enable redis
+
+# Install PHP extensions
+RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo && \
+    docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
+
+# Install XML-RPC 
+RUN pecl install apcu xmlrpc-beta && \
+    docker-php-ext-enable xmlrpc  
+    
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php && \
     php -r "unlink('composer-setup.php');" && \
     mv composer.phar /usr/local/bin/composer
 
-# Install PECL and PEAR extensions
-RUN pecl install xdebug redis apcu imagick xmlrpc-beta swoole && \
-    docker-php-ext-enable xdebug redis apcu imagick xmlrpc swoole
-
-# Install PHP_CodeSniffer, phpmd, phpunit
+# Install PHP_CodeSniffer and related tools
 RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar && \
     curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar && \
     curl -OL https://github.com/phpmd/phpmd/releases/download/2.8.2/phpmd.phar && \
-    curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar && \
-    mv phpcs.phar /usr/local/bin/phpcs && chmod +x /usr/local/bin/phpcs && \
-    mv phpcbf.phar /usr/local/bin/phpcbf && chmod +x /usr/local/bin/phpcbf && \
-    mv phpmd.phar /usr/local/bin/phpmd && chmod +x /usr/local/bin/phpmd && \
-    mv phpunit-8.5.3.phar /usr/local/bin/phpunit && chmod +x /usr/local/bin/phpunit
+    cp phpcs.phar /usr/local/bin/phpcs && \
+    chmod +x /usr/local/bin/phpcs && \
+    cp phpcbf.phar /usr/local/bin/phpcbf && \
+    chmod +x /usr/local/bin/phpcbf && \
+    cp phpmd.phar /usr/local/bin/phpmd && \
+    chmod +x /usr/local/bin/phpmd
 
-# Add opcache configuration file
-RUN echo "\
-opcache.enable=1 \n\
-opcache.memory_consumption=1024 \n\
-opcache.interned_strings_buffer=128 \n\
-opcache.max_accelerated_files=32531 \n\
-opcache.validate_timestamps=0 \n\
-opcache.save_comments=1 \n\
-opcache.fast_shutdown=0 \n\
-opcache.enable_cli=1 \n\
-" > $PHP_INI_DIR/conf.d/opcache.ini
+# Install PHPUnit
+RUN curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar && \
+    cp phpunit-8.5.3.phar /usr/local/bin/phpunit && \
+    chmod +x /usr/local/bin/phpunit
 
-# Configure PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-configure bcmath --enable-bcmath && \
-    docker-php-ext-configure intl --enable-intl && \
-    docker-php-ext-configure pcntl --enable-pcntl && \
-    docker-php-ext-configure pgsql && \
-    docker-php-ext-configure mysqli --with-mysqli && \
-    docker-php-ext-configure pdo_mysql --with-pdo-mysql && \
-    docker-php-ext-configure pdo_pgsql && \
-    docker-php-ext-configure mbstring --enable-mbstring && \
-    docker-php-ext-configure soap --enable-soap && \
-    docker-php-ext-configure gmp && \
-    docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo
-
-# Tweak php-fpm config
+# Tweak php-fpm and PHP configurations
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/pm.max_children = 5/pm.max_children = 40/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/pm.start_servers = 2/pm.start_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
@@ -76,26 +100,21 @@ RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /
     sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 500/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/;pm.status_path/pm.status_path/g" /usr/local/etc/php-fpm.d/www.conf
 
-# Memory Limit
+# Memory and execution limits
 RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini && \
     echo "max_execution_time=900" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
-    echo "extension=apcu.so" > $PHP_INI_DIR/conf.d/apcu.ini && \
     echo "post_max_size=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
-    echo "upload_max_filesize=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini
+    echo "upload_max_filesize=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
+    echo "extension=apcu.so" > $PHP_INI_DIR/conf.d/apcu.ini
 
 # Time Zone
 RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > $PHP_INI_DIR/conf.d/date_timezone.ini
 
-# Display errors in stderr
-RUN echo "display_errors=stderr" > $PHP_INI_DIR/conf.d/display-errors.ini
-
-# Disable PathInfo and expose PHP
-RUN echo "cgi.fix_pathinfo=0" > $PHP_INI_DIR/conf.d/path-info.ini && \
-    echo "expose_php=0" > $PHP_INI_DIR/conf.d/path-info.ini
-
-# Configure Git to treat this directory as safe
+# Configure Git to treat the directory as safe
 RUN git config --global --add safe.directory /var/www/html
 
+# Set the working directory
 WORKDIR /var/www/html
-RUN npm -v
-RUN php -i
+
+# Check versions of installed tools
+RUN npm -v && php -i
