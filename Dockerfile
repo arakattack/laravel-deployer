@@ -62,8 +62,9 @@ RUN pecl install xdebug && \
     docker-php-ext-enable redis
 
 # Install PHP extensions
-RUN docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo && \
-    docker-php-ext-enable mysqli zip pdo_pgsql pdo_mysql
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo \
+    && docker-php-ext-enable gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo
 
 # Install XML-RPC 
 RUN pecl install apcu xmlrpc-beta && \
