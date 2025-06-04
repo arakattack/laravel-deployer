@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
+    libjpeg-dev \
+    libwebp-dev \
     libmcrypt-dev \
     libpng-dev \
     libbz2-dev \
@@ -62,7 +64,7 @@ RUN pecl install xdebug && \
     docker-php-ext-enable redis
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo \
     && docker-php-ext-enable gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo
 
