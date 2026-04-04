@@ -40,8 +40,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Microsoft ODBC Driver and Postgres Client
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+RUN curl -sSL -O https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
     wget https://deb.sipwise.com/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
     dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb && \
     install -d /usr/share/postgresql-common/pgdg && \
@@ -51,7 +52,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
       > /etc/apt/sources.list.d/pgdg.list && \
     curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash - && \
-    apt-get update && apt-get install -y msodbcsql17 unixodbc-dev postgresql-client-18 libpq-dev nodejs
+    apt-get update && apt-get install -y postgresql-client-18 libpq-dev nodejs
 
 # Install swoole
 RUN pecl install swoole && \
