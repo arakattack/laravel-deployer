@@ -4,8 +4,8 @@ ENV ACCEPT_EULA=Y
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Install utilities
-RUN apt install software-properties-common -y
 RUN apt-get update && apt-get install -y \
+    software-properties-common \
     wget \
     gnupg \
     apt-transport-https \
