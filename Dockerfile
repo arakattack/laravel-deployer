@@ -5,7 +5,6 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Install utilities
 RUN apt-get update && apt-get install -y \
-    software-properties-common \
     wget \
     gnupg \
     apt-transport-https \
@@ -29,8 +28,8 @@ RUN apt-get update && apt-get install -y \
     sqlite3 \
     libsqlite3-dev \
     libgmp-dev \
-    libpcre3 \
-    libpcre3-dev \
+    libpcre2 \
+    libpcre2-dev \
     openssl \
     libssl-dev \
     libmagickwand-dev \
