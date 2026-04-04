@@ -43,8 +43,6 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sSL -O https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     rm packages-microsoft-prod.deb && \
-    wget https://deb.sipwise.com/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
-    dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb && \
     install -d /usr/share/postgresql-common/pgdg && \
     curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
       -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc && \
@@ -52,7 +50,7 @@ RUN curl -sSL -O https://packages.microsoft.com/config/debian/13/packages-micros
     echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
       > /etc/apt/sources.list.d/pgdg.list && \
     curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash - && \
-    apt-get update && apt-get install -y postgresql-client-18 libpq-dev nodejs
+    apt-get update && apt-get install -y unixodbc postgresql-client-18 libpq-dev nodejs
 
 # Install swoole
 RUN pecl install swoole && \
