@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Base utilities + build deps for PHP extensions
+# Base utilities + build dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -65,15 +65,23 @@ RUN curl -sSL -O https://packages.microsoft.com/config/debian/13/packages-micros
     && rm -rf /var/lib/apt/lists/*
 
 # PECL extensions
-RUN pecl channel-update pecl.php.net && \
-    pecl install swoole redis xdebug apcu xmlrpc-beta && \
-    docker-php-ext-enable swoole redis xdebug apcu xmlrpc
+# Setelah build stabil, lebih baik pin versinya secara eksplisit.
+RUN pecl channel-update pecl.php.net
 
-# Optional: only if you actually connect PHP to Microsoft SQL Server
-RUN pecl install sqlsrv pdo_sqlsrv && \
-    docker-php-ext-enable sqlsrv pdo_sqlsrv
+RUN pecl install swoole && docker-php-ext-enable swoole
+RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install apcu && docker-php-ext-enable apcu
+RUN pecl install xmlrpc-beta && docker-php-ext-enable xmlrpc
+
+# Optional: aktifkan hanya bila aplikasi memang perlu SQL Server dari PHP
+RUN pecl install sqlsrv && docker-php-ext-enable sqlsrv
+RUN pecl install pdo_sqlsrv && docker-php-ext-enable pdo_sqlsrv
 
 # Core PHP extensions from php-src
+# Penting:
+# - fileinfo TIDAK perlu diinstall (sudah enabled by default)
+# - opcache TIDAK perlu diinstall di PHP 8.5 (sudah built-in)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j1 \
       gd \
@@ -88,7 +96,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
       zip \
       bz2 \
       gmp \
-      opcache \
       exif
 
 # Composer
@@ -103,7 +110,6 @@ RUN curl -fsSLo /usr/local/bin/phpcs https://squizlabs.github.io/PHP_CodeSniffer
     chmod +x /usr/local/bin/phpcs /usr/local/bin/phpcbf /usr/local/bin/phpmd
 
 # PHPUnit
-# Catatan: ini sengaja saya naikkan dari 8.5.3, karena 8.5 sangat tua untuk ekosistem modern PHP 8.x
 RUN curl -fsSLo /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-10.phar && \
     chmod +x /usr/local/bin/phpunit
 
@@ -124,6 +130,18 @@ RUN { \
       echo "upload_max_filesize=100M"; \
     } > "$PHP_INI_DIR/conf.d/runtime.ini"
 
+# OPcache config for PHP 8.5
+# Jangan pakai zend_extension=opcache.so
+RUN { \
+      echo "opcache.enable=1"; \
+      echo "opcache.enable_cli=0"; \
+      echo "opcache.memory_consumption=256"; \
+      echo "opcache.interned_strings_buffer=16"; \
+      echo "opcache.max_accelerated_files=20000"; \
+      echo "opcache.validate_timestamps=0"; \
+      echo "opcache.revalidate_freq=0"; \
+    } > "$PHP_INI_DIR/conf.d/opcache.ini"
+
 # Time zone
 RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > "$PHP_INI_DIR/conf.d/date_timezone.ini"
 
@@ -135,6 +153,6 @@ WORKDIR /var/www/html
 # Sanity check
 RUN php -v && \
     php -m | sort && \
-    php -i | grep -E "PDO|pgsql|sqlsrv|ODBC|xdebug|redis|swoole|APCu" || true && \
+    php -i | grep -E "PDO|pgsql|sqlsrv|ODBC|xdebug|redis|swoole|APCu|Zend OPcache" || true && \
     composer --version && \
     node -v && npm -v
