@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     git \
     lsb-release \
     curl \
+    ca-certificates \
     cron \
     unzip \
     libtool \
@@ -43,11 +44,14 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     wget https://deb.sipwise.com/debian/pool/main/g/glibc/multiarch-support_2.24-11+deb9u4_amd64.deb && \
     dpkg -i multiarch-support_2.24-11+deb9u4_amd64.deb && \
-    touch /etc/apt/sources.list.d/pgdg.list && \
-    echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    install -d /usr/share/postgresql-common/pgdg && \
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+      -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc && \
+    . /etc/os-release && \
+    echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
+      > /etc/apt/sources.list.d/pgdg.list && \
     curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash - && \
-    apt-get update && apt-get install -y msodbcsql17 unixodbc-dev postgresql-client-14 libpq-dev nodejs
+    apt-get update && apt-get install -y msodbcsql17 unixodbc-dev postgresql-client-18 libpq-dev nodejs
 
 # Install swoole
 RUN pecl install swoole && \
