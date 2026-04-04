@@ -1,9 +1,11 @@
 FROM php:8.5-fpm
+
 ENV ACCEPT_EULA=Y
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Install utilities
+# Base utilities + build deps for PHP extensions
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -16,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libtool \
     libxml2-dev \
+    libicu-dev \
     zlib1g \
     zip \
     libcurl4-gnutls-dev \
@@ -37,9 +40,10 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     memcached \
     default-mysql-client \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Microsoft ODBC Driver and Postgres Client
+# Microsoft repo + PGDG repo + NodeSource
 RUN curl -sSL -O https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     rm packages-microsoft-prod.deb && \
@@ -49,75 +53,88 @@ RUN curl -sSL -O https://packages.microsoft.com/config/debian/13/packages-micros
     . /etc/os-release && \
     echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
       > /etc/apt/sources.list.d/pgdg.list && \
-    curl -sL https://deb.nodesource.com/setup_20.x | /bin/bash - && \
-    apt-get update && apt-get install -y unixodbc postgresql-client-18 libpq-dev nodejs
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get update && apt-get install -y \
+      unixodbc \
+      unixodbc-dev \
+      msodbcsql18 \
+      postgresql-client-18 \
+      libpq-dev \
+      nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install swoole
-RUN pecl install swoole && \
-    touch $PHP_INI_DIR/conf.d/swoole.ini && \
-    echo "extension=swoole.so" > $PHP_INI_DIR/conf.d/swoole.ini
+# PECL extensions
+RUN pecl channel-update pecl.php.net && \
+    pecl install swoole redis xdebug apcu xmlrpc-beta && \
+    docker-php-ext-enable swoole redis xdebug apcu xmlrpc
 
-# Install PECL extensions
-RUN pecl install xdebug && \
-    docker-php-ext-enable xdebug && \
-    pecl install redis && \
-    docker-php-ext-enable redis
+# Optional: only if you actually connect PHP to Microsoft SQL Server
+RUN pecl install sqlsrv pdo_sqlsrv && \
+    docker-php-ext-enable sqlsrv pdo_sqlsrv
 
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo \
-    && docker-php-ext-enable gd bcmath intl pcntl mysqli pdo_mysql pdo_pgsql pgsql soap zip bz2 gmp opcache exif fileinfo
+# Core PHP extensions from php-src
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j1 \
+      gd \
+      bcmath \
+      intl \
+      pcntl \
+      mysqli \
+      pdo_mysql \
+      pdo_pgsql \
+      pgsql \
+      soap \
+      zip \
+      bz2 \
+      gmp \
+      opcache \
+      exif
 
-# Install XML-RPC 
-RUN pecl install apcu xmlrpc-beta && \
-    docker-php-ext-enable xmlrpc  
-    
-# Install Composer
+# Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-    php composer-setup.php && \
-    php -r "unlink('composer-setup.php');" && \
-    mv composer.phar /usr/local/bin/composer
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
+    rm -f composer-setup.php
 
-# Install PHP_CodeSniffer and related tools
-RUN curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar && \
-    curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar && \
-    curl -OL https://github.com/phpmd/phpmd/releases/download/2.8.2/phpmd.phar && \
-    cp phpcs.phar /usr/local/bin/phpcs && \
-    chmod +x /usr/local/bin/phpcs && \
-    cp phpcbf.phar /usr/local/bin/phpcbf && \
-    chmod +x /usr/local/bin/phpcbf && \
-    cp phpmd.phar /usr/local/bin/phpmd && \
-    chmod +x /usr/local/bin/phpmd
+# QA tools
+RUN curl -fsSLo /usr/local/bin/phpcs https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar && \
+    curl -fsSLo /usr/local/bin/phpcbf https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar && \
+    curl -fsSLo /usr/local/bin/phpmd https://github.com/phpmd/phpmd/releases/download/2.15.0/phpmd.phar && \
+    chmod +x /usr/local/bin/phpcs /usr/local/bin/phpcbf /usr/local/bin/phpmd
 
-# Install PHPUnit
-RUN curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar && \
-    cp phpunit-8.5.3.phar /usr/local/bin/phpunit && \
+# PHPUnit
+# Catatan: ini sengaja saya naikkan dari 8.5.3, karena 8.5 sangat tua untuk ekosistem modern PHP 8.x
+RUN curl -fsSLo /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-10.phar && \
     chmod +x /usr/local/bin/phpunit
 
-# Tweak php-fpm and PHP configurations
+# php-fpm tuning
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/pm.max_children = 5/pm.max_children = 40/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/pm.start_servers = 2/pm.start_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 25/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 500/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i -e "s/;pm.status_path/pm.status_path/g" /usr/local/etc/php-fpm.d/www.conf
+    sed -i -e "s/;pm.status_path = \\/status/pm.status_path = \\/status/g" /usr/local/etc/php-fpm.d/www.conf
 
-# Memory and execution limits
-RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini && \
-    echo "max_execution_time=900" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
-    echo "post_max_size=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
-    echo "upload_max_filesize=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
-    echo "extension=apcu.so" > $PHP_INI_DIR/conf.d/apcu.ini
+# PHP runtime settings
+RUN { \
+      echo "memory_limit=2048M"; \
+      echo "max_execution_time=900"; \
+      echo "post_max_size=100M"; \
+      echo "upload_max_filesize=100M"; \
+    } > "$PHP_INI_DIR/conf.d/runtime.ini"
 
-# Time Zone
-RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > $PHP_INI_DIR/conf.d/date_timezone.ini
+# Time zone
+RUN echo "date.timezone=${PHP_TIMEZONE:-UTC}" > "$PHP_INI_DIR/conf.d/date_timezone.ini"
 
-# Configure Git to treat the directory as safe
+# Git safe directory
 RUN git config --global --add safe.directory /var/www/html
 
-# Set the working directory
 WORKDIR /var/www/html
 
-# Check versions of installed tools
-RUN npm -v && php -i
+# Sanity check
+RUN php -v && \
+    php -m | sort && \
+    php -i | grep -E "PDO|pgsql|sqlsrv|ODBC|xdebug|redis|swoole|APCu" || true && \
+    composer --version && \
+    node -v && npm -v
