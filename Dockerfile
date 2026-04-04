@@ -4,6 +4,7 @@ ENV ACCEPT_EULA=Y
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Install utilities
+RUN sudo add-apt-repository universe
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
