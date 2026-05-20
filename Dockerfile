@@ -96,18 +96,23 @@ RUN curl -OL https://phar.phpunit.de/phpunit-8.5.3.phar && \
 
 # Tweak php-fpm and PHP configurations
 RUN sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i -e "s/pm.max_children = 5/pm.max_children = 40/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i -e "s/pm.start_servers = 2/pm.start_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 25/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i -e "s/pm = dynamic/pm = dynamic/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i -e "s/pm.max_children = 5/pm.max_children = 15/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i -e "s/pm.start_servers = 2/pm.start_servers = 4/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = 3/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = 8/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i -e "s/;pm.max_requests = 500/pm.max_requests = 500/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i -e "s/;pm.status_path/pm.status_path/g" /usr/local/etc/php-fpm.d/www.conf
+    sed -i -e "s/;pm.status_path = \/status/pm.status_path = \/status/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Memory and execution limits
-RUN echo "memory_limit=2048M" > $PHP_INI_DIR/conf.d/memory-limit.ini && \
-    echo "max_execution_time=900" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
+RUN echo "memory_limit=512M" > $PHP_INI_DIR/conf.d/memory-limit.ini && \
+    echo "max_execution_time=60" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
+    echo "max_input_time=60" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
+    echo "default_socket_timeout=60" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
     echo "post_max_size=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
     echo "upload_max_filesize=100M" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
+    echo "realpath_cache_size=4096K" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
+    echo "realpath_cache_ttl=600" >> $PHP_INI_DIR/conf.d/memory-limit.ini && \
     echo "extension=apcu.so" > $PHP_INI_DIR/conf.d/apcu.ini
 
 # Time Zone
