@@ -126,3 +126,4 @@ WORKDIR /var/www/html
 
 # Check versions of installed tools
 RUN npm -v && php -i
+
