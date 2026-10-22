@@ -4,7 +4,6 @@ ENV ACCEPT_EULA=Y
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-
 # Base utilities + build dependencies
 RUN apt-get update && apt-get install -y \
     wget \
