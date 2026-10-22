@@ -1,4 +1,4 @@
-FROM php:8.5-fpm
+FROM php:8.5.12-fpm
 
 ENV ACCEPT_EULA=Y
 ENV DEBIAN_FRONTEND=noninteractive
